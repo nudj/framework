@@ -124,7 +124,6 @@ class MockApi {
   }
 }
 
-
 module.exports = ({
   mockData
 }) => {

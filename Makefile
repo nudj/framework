@@ -7,6 +7,7 @@ BIN:=./node_modules/.bin
 build:
 	@docker build \
 		-t $(IMAGEDEV) \
+		--build-arg NPM_TOKEN=${NPM_TOKEN} \
 		.
 
 ssh:
