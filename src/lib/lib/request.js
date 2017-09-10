@@ -11,7 +11,7 @@ let config = {
   }
 }
 try {
-  if (process.title === 'node') {
+  if (process.title.includes('node')) {
     config.baseURL = 'http://api:81/'
   }
 } catch (error) {
