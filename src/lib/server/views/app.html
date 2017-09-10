@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <%= helmet.title.toString() %>
+  <%= helmet.meta.toString() %>
+  <%= helmet.link.toString() %>
+  <script>
+    var data = <%= data %>
+    var cssRenderedClassNames = <%= JSON.stringify(css.renderedClassNames) %>
+  </script>
+  <script>
+    (function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+    new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+    j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+    'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+    })(window,document,'script','dataLayer','GTM-WT43QJJ');
+    var data = <%= data %>
+    var renderedClassNames = <%= JSON.stringify(css.renderedClassNames) %>
+  </script>
+  <style>* { box-sizing: border-box; }</style>
+  <style data-aphrodite><%= css.content %></style>
+</head>
+<body>
+  <div id="app"><%= html %></div>
+  <script src="/assets/js/vendors.js"></script>
+  <script src="/assets/js/app.js"></script>
+</body>
+</html>
