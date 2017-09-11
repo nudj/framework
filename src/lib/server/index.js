@@ -1,16 +1,16 @@
-let path = require('path')
-let express = require('express')
-let bodyParser = require('body-parser')
-let cons = require('consolidate')
-let session = require('express-session')
-let passport = require('passport')
-let Auth0Strategy = require('passport-auth0')
-let csrf = require('csurf')
-let redis = require('redis')
-let RedisStore = require('connect-redis')(session)
+const path = require('path')
+const express = require('express')
+const bodyParser = require('body-parser')
+const cons = require('consolidate')
+const session = require('express-session')
+const passport = require('passport')
+const Auth0Strategy = require('passport-auth0')
+const csrf = require('csurf')
+const redis = require('redis')
+const RedisStore = require('connect-redis')(session)
 
-let logger = require('../lib/logger')
-let getMiddleware = require('./lib/middleware')
+const logger = require('../lib/logger')
+const getMiddleware = require('./lib/middleware')
 
 module.exports = ({
   reduxRoutes,
@@ -34,11 +34,25 @@ module.exports = ({
   passport.serializeUser((user, done) => done(null, user))
   passport.deserializeUser((user, done) => done(null, user))
 
-  let app = express()
-  let sessionOpts = {
+  const app = express()
+  const sessionOpts = {
     secret: process.env.SESSION_SECRET,
     resave: true,
     saveUninitialized: true
+  }
+  const customAssetOptions = {
+    index: false
+  }
+  const frameworkAssetOptions = {
+    index: false,
+    setHeaders: (res, path) => {
+      res.setHeader('Cache-Control', 'public, max-age=31536000')
+    }
+  }
+  const middlewareOptions = {
+    reduxRoutes,
+    reduxReducers,
+    mockData
   }
 
   if (process.env.NODE_ENV === 'production') {
@@ -59,8 +73,8 @@ module.exports = ({
 
   app.use(bodyParser.urlencoded({ extended: false }))
   app.use(bodyParser.json())
-  app.use('/assets', express.static(expressAssetPath))
-  app.use('/assets', express.static(path.join(__dirname, 'assets')))
+  app.use('/assets', express.static(expressAssetPath, customAssetOptions))
+  app.use('/assets', express.static(path.join(__dirname, 'assets'), frameworkAssetOptions))
   app.use(session(sessionOpts))
   app.use(passport.initialize())
   app.use(passport.session())
@@ -77,11 +91,6 @@ module.exports = ({
 
   // add expressRouters
   expressRouters.forEach(router => {
-    const middlewareOptions = {
-      reduxRoutes,
-      reduxReducers,
-      mockData
-    }
     const middleware = getMiddleware(middlewareOptions)
     app.use(router(middleware))
   })
