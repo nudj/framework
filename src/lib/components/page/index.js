@@ -23,12 +23,9 @@ const Page = (props) => {
       <div className={`${props.className}`}>
         <Helmet>
           <meta charSet='utf-8' />
-          <title>nudj</title>
           <meta name='viewport' content='width=device-width, initial-scale=1' />
-          <meta name='title' content='ADMIN' />
-          <link rel='icon' href='/assets/images/nudj-square.ico' type='image/x-icon' />
-          <link rel='stylesheet' href='https://cdnjs.cloudflare.com/ajax/libs/normalize/7.0.0/normalize.min.css' />
-          <link rel='stylesheet' href='/assets/css/reset.css' />
+          <meta name='title' content='nudj' />
+          <title>nudj</title>
         </Helmet>
         <Notification notification={props.notification} dispatch={props.dispatch} />
         {props.children}
