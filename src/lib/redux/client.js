@@ -2,17 +2,30 @@
 
 const React = require('react')
 const ReactDOM = require('react-dom')
-const { createStore, combineReducers, applyMiddleware } = require('redux')
+const {
+  createStore,
+  combineReducers,
+  applyMiddleware
+} = require('redux')
 const { Provider } = require('react-redux')
 const { createBrowserHistory } = require('history')
-const { ConnectedRouter, routerMiddleware, routerReducer } = require('@nudj/react-router-redux')
+const {
+  ConnectedRouter,
+  routerMiddleware,
+  routerReducer,
+  replace
+} = require('@nudj/react-router-redux')
 const thunkMiddleware = require('redux-thunk').default
 const { StyleSheet } = require('aphrodite/no-important')
 const { merge } = require('@nudj/library')
 
 const ReduxApp = require('./')
 const appReducer = require('./reducers/app')
-const { setPage, showLoading } = require('./actions/app')
+const {
+  setPage,
+  showLoading,
+  showError
+} = require('./actions/app')
 const request = require('../lib/request')
 
 const Client = ({
@@ -30,39 +43,47 @@ const Client = ({
     data,
     applyMiddleware(thunkMiddleware, historyMiddleware)
   )
+  const latestRequest = {}
+
+  function fetchData (location, hash, dispatch) {
+    return request(location)
+      .then((data) => {
+        if (data) {
+          // only update page state if this is the latest request
+          if (hash === latestRequest.hash) {
+            dispatch(setPage(data))
+          }
+          // if the url inside the data does not match the original request it means a redirect has been followed by the browser so the url needs to be updated to match
+          if (data.app.url.originalUrl !== window.location.pathname) {
+            dispatch(replace(data.app.url.originalUrl))
+          }
+        }
+      })
+      .catch((error) => {
+        console.error(error)
+        if (error.message === 'Unauthorized') {
+          // refresh the page to trigger a login redirection
+          window.location = ''
+          return
+        }
+        dispatch(showError())
+      })
+  }
 
   StyleSheet.rehydrate(renderedClassNames)
   ReactDOM.render(
     <Provider store={store}>
-      <ConnectedRouter history={history} onChange={(dispatch, location) => {
-        // only fetch new page data if...
-        // - history action is not PUSH
-        // - history action is PUSH and requested url is not already in page data (page data is stale)
-        const newUrl = location.pathname
-        const oldUrl = store.getState().app.url.originalUrl
-        if (newUrl === '/logout') {
+      <ConnectedRouter history={history} onChange={(dispatch, location, historyAction) => {
+        const url = location.pathname
+        const hash = location.key
+        // ignore replace actions to reserve them for updating the url only
+        if (historyAction !== 'REPLACE') {
           dispatch(showLoading())
-          window.location = `${newUrl}?returnTo=${encodeURIComponent(oldUrl)}`
-        } else if (newUrl !== oldUrl) {
-          dispatch(showLoading())
-          request(location.pathname)
-          .catch((error) => {
-            switch (error.message) {
-              case 'Unauthorized':
-                // refresh the page to trigger a login redirection when Unauthorized
-                window.location = ''
-                break
-              default:
-                console.log(error)
-            }
-          })
-          .then((data) => {
-            // only update page state if it is the date for the page we are currently viewing
-            if (data && data.app.url.originalUrl === store.getState().router.location.pathname) {
-              return dispatch(setPage(data))
-            }
-          })
+          latestRequest.hash = hash
+          latestRequest.url = url
+          return fetchData(url, hash, dispatch)
         }
+        return Promise.resolve()
       }}>
         <ReduxApp {...data.app} App={App} routes={reduxRoutes} />
       </ConnectedRouter>
