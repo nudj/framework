@@ -8,7 +8,7 @@ const ServerError = (props) => {
   return (
     <div className={style.content}>
       <Helmet>
-        <title>ADMIN - something went wrong</title>
+        <title>nudj - something went wrong</title>
       </Helmet>
       <div className={style.gif}>
         <img src='https://media.giphy.com/media/ZeB4HcMpsyDo4/giphy.gif' width='320' height='202' />

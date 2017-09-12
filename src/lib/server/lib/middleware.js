@@ -1,6 +1,6 @@
 const get = require('lodash/get')
 const find = require('lodash/find')
-const _ensureLoggedIn = require('connect-ensure-login').ensureLoggedIn()
+const _ensureLoggedIn = require('connect-ensure-login')
 const getTime = require('date-fns/get_time')
 const { merge } = require('@nudj/library')
 
@@ -8,18 +8,13 @@ const logger = require('../../lib/logger')
 const app = require('../../redux/server')
 
 const getMiddleware = ({
+  App,
   reduxRoutes,
   reduxReducers,
-  mockData
+  mockData,
+  spoofLoggedIn,
+  errorHandlers
 }) => {
-  function spoofLoggedIn (req, res, next) {
-    req.session.data = req.session.data || {
-      hirer: find(mockData.hirers, { id: 'hirer1' }),
-      person: find(mockData.people, { id: 'person5' })
-    }
-    return next()
-  }
-
   function doEnsureLoggedIn (req, res, next) {
     if (req.session.logout) {
       let url = req.originalUrl.split('/')
@@ -31,7 +26,7 @@ const getMiddleware = ({
           return res.status(401).send()
         }
       }
-      _ensureLoggedIn(req, res, next)
+      _ensureLoggedIn.ensureLoggedIn({ setReturnTo: !req.session.returnTo })(req, res, next)
     }
     delete req.session.logout
   }
@@ -65,45 +60,47 @@ const getMiddleware = ({
     }
   }
 
+  const frameworkErrorHandlers = {
+    'Invalid url': () => ({
+      message: {
+        code: 400,
+        error: 'error',
+        message: 'Form submission data invalid'
+      }
+    }),
+    'Not found': () => ({
+      error: {
+        code: 404,
+        type: 'error',
+        message: 'Not found'
+      }
+    }),
+    'Error': () => ({
+      error: {
+        code: 500,
+        type: 'error',
+        message: 'Something went wrong'
+      }
+    })
+  }
+  const allErrorHandlers = merge(frameworkErrorHandlers, errorHandlers)
+
   function getErrorHandler (req, res, next) {
     return (error) => {
       try {
-        let data, errorMessage
-        switch (error.message) {
-          // renders with message
-          case 'Invalid url':
-            errorMessage = {
-              code: 400,
-              error: 'error',
-              message: 'Form submission data invalid'
-            }
-            data = getRenderDataBuilder(req)({
-              message: errorMessage
-            })
-            getRenderer(req, res, next)(data)
-            break
-          // full page errors
-          default:
-            logger.log('error', error.message, error)
-            switch (error.message) {
-              case 'Not found':
-                errorMessage = {
-                  code: 404,
-                  type: 'error',
-                  message: 'Not found'
-                }
-                break
-              default:
-                errorMessage = {
-                  code: 500,
-                  type: 'error',
-                  message: 'Something went wrong'
-                }
-            }
-            data = getRenderDataBuilder(req)({
-              error: errorMessage
-            })
-            getRenderer(req, res, next)(data)
+        logger.log('error', error.message, error)
+
+        let data
+        if (allErrorHandlers[error.message]) {
+          data = allErrorHandlers[error.message](res, res, next, error)
+        } else {
+          data = allErrorHandlers.Error()
+        }
+
+        // check for data as handler may have redirected
+        if (data) {
+          data = getRenderDataBuilder(req)(data)
+          getRenderer(req, res, next)(data)
         }
       } catch (error) {
         logger.log('error', error)
@@ -120,6 +117,7 @@ const getMiddleware = ({
         return res.json(data)
       }
       let staticContext = app({
+        App,
         reduxRoutes,
         reduxReducers,
         data
@@ -146,20 +144,26 @@ const getMiddleware = ({
   function respondWith (dataFetcher) {
     return (req, res, next) => {
       return dataFetcher({
-        data: merge(req.session.data),
+        data: merge(req.session.data || {}),
         params: req.params,
         body: req.body,
         req
       })
       .then(getRenderDataBuilder(req, res, next))
       .then(getRenderer(req, res, next))
-      .catch(getErrorHandler(req, res, next))
+      .catch(error => next(error))
     }
+  }
+
+  function render (req, res, next, data) {
+    data = getRenderDataBuilder(req, res, next)(data)
+    getRenderer(req, res, next)(data)
   }
 
   return {
     ensureLoggedIn,
-    respondWith
+    respondWith,
+    render
   }
 }
 

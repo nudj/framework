@@ -10,12 +10,13 @@ const thunkMiddleware = require('redux-thunk').default
 const { StyleSheet } = require('aphrodite/no-important')
 const { merge } = require('@nudj/library')
 
-const Routes = require('./routes')
+const ReduxApp = require('./')
 const appReducer = require('./reducers/app')
 const { setPage, showLoading } = require('./actions/app')
 const request = require('../lib/request')
 
 const Client = ({
+  App,
   reduxRoutes,
   reduxReducers
 }) => {
@@ -63,7 +64,7 @@ const Client = ({
           })
         }
       }}>
-        <Routes routes={reduxRoutes} />
+        <ReduxApp {...data.app} App={App} routes={reduxRoutes} />
       </ConnectedRouter>
     </Provider>,
     document.getElementById('app')
