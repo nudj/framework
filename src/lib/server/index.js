@@ -108,6 +108,12 @@ module.exports = ({
   app.use(session(sessionOpts))
   app.use(passport.initialize())
   app.use(passport.session())
+
+  // add insecure expressRouters
+  expressRouters.insecure.forEach(router => {
+    app.use(router(middleware))
+  })
+
   app.use(csrf({}))
   app.use((req, res, next) => {
     if (req.body && req.body._csrf) {
@@ -119,8 +125,8 @@ module.exports = ({
     next()
   })
 
-  // add expressRouters
-  expressRouters.forEach(router => {
+  // add secure expressRouters
+  expressRouters.secure.forEach(router => {
     app.use(router(middleware))
   })
 
