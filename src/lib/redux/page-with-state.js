@@ -7,7 +7,7 @@ const get = require('lodash/get')
 const { initialise } = require('./actions')
 
 class Component extends React.Component {
-  componentDidMount() {
+  componentDidMount () {
     const initialised = get(this.props, 'app.initialised')
     if (!initialised) {
       this.props.dispatch(initialise())
