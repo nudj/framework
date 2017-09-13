@@ -5,7 +5,6 @@ const get = require('lodash/get')
 const PageWithState = require('./page-with-state')
 const Status = require('../components/status')
 const ErrorPage = require('../components/error-page')
-const PageNotFound = require('../components/404-page')
 
 const objectMapToArray = (obj, fn) => {
   return Object.keys(obj).map(key => fn(key, obj[key]))

@@ -93,7 +93,7 @@ module.exports = ({
   }
   if (process.env.USE_MOCKS === 'true') {
     // start mock api
-    let mockApi = require('../mocks')({ mockData })
+    let mockApi = require('../mocks')({ data: mockData })
     mockApi.listen(81, 82, () => logger.log('info', 'Mock APIs running'))
   }
 

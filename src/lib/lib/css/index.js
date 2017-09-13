@@ -1,4 +1,4 @@
-const { StyleSheet, css: _css } = require('aphrodite/no-important')
+const { StyleSheet } = require('aphrodite/no-important')
 const { merge } = require('@nudj/library')
 
 const variables = require('./variables')

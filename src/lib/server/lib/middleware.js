@@ -1,10 +1,8 @@
 const get = require('lodash/get')
-const find = require('lodash/find')
 const _ensureLoggedIn = require('connect-ensure-login')
 const getTime = require('date-fns/get_time')
 const { merge } = require('@nudj/library')
 
-const logger = require('../../lib/logger')
 const app = require('../../redux/server')
 
 const getMiddleware = ({
@@ -60,55 +58,6 @@ const getMiddleware = ({
     }
   }
 
-  const frameworkErrorHandlers = {
-    'Invalid url': () => ({
-      message: {
-        code: 400,
-        error: 'error',
-        message: 'Form submission data invalid'
-      }
-    }),
-    'Not found': () => ({
-      error: {
-        code: 404,
-        type: 'error',
-        message: 'Not found'
-      }
-    }),
-    'Error': () => ({
-      error: {
-        code: 500,
-        type: 'error',
-        message: 'Something went wrong'
-      }
-    })
-  }
-  const allErrorHandlers = merge(frameworkErrorHandlers, errorHandlers)
-
-  function getErrorHandler (req, res, next) {
-    return (error) => {
-      try {
-        logger.log('error', error.message, error)
-
-        let data
-        if (allErrorHandlers[error.message]) {
-          data = allErrorHandlers[error.message](res, res, next, error)
-        } else {
-          data = allErrorHandlers.Error()
-        }
-
-        // check for data as handler may have redirected
-        if (data) {
-          data = getRenderDataBuilder(req)(data)
-          getRenderer(req, res, next)(data)
-        }
-      } catch (error) {
-        logger.log('error', error)
-        next(error)
-      }
-    }
-  }
-
   function getRenderer (req, res, next) {
     return (data) => {
       delete req.session.logout
@@ -151,7 +100,7 @@ const getMiddleware = ({
       })
       .then(getRenderDataBuilder(req, res, next))
       .then(getRenderer(req, res, next))
-      .catch(error => next(error))
+      .catch(next)
     }
   }
 
