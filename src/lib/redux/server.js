@@ -9,7 +9,7 @@ const thunkMiddleware = require('redux-thunk').default
 const { merge } = require('@nudj/library')
 
 const ReduxApp = require('./')
-const appReducer = require('./reducers/app')
+const appReducer = require('./reducer')
 
 module.exports = ({
   App,

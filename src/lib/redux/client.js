@@ -20,12 +20,12 @@ const { StyleSheet } = require('aphrodite/no-important')
 const { merge } = require('@nudj/library')
 
 const ReduxApp = require('./')
-const appReducer = require('./reducers/app')
+const appReducer = require('./reducer')
 const {
   setPage,
   showLoading,
   showError
-} = require('./actions/app')
+} = require('./actions')
 const request = require('../lib/request')
 
 const Client = ({

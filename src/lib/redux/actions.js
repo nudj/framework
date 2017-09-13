@@ -1,7 +1,27 @@
 const { push } = require('@nudj/react-router-redux')
 const get = require('lodash/get')
-const request = require('../../lib/request')
 const { merge } = require('@nudj/library')
+
+const request = require('../lib/request')
+
+const INITIALISED = 'INITIALISED'
+module.exports.INITIALISED = INITIALISED
+function initialised (notification) {
+  return {
+    type: INITIALISED,
+    notification
+  }
+}
+module.exports.initialise = () => {
+  return (dispatch, getState) => {
+    const state = getState()
+    const notification = get(state, 'app.notification')
+    if (notification) {
+      notification.timer = setTimeout(() => dispatch(hideNotification()), 5000)
+    }
+    dispatch(initialised(notification))
+  }
+}
 
 const FETCHED_PAGE = 'FETCHED_PAGE'
 module.exports.FETCHED_PAGE = FETCHED_PAGE

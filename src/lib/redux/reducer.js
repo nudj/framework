@@ -1,4 +1,7 @@
-let {
+const { merge } = require('@nudj/library')
+
+const {
+  INITIALISED,
   SENDING,
   FETCHED_PAGE,
   SHOW_DIALOG,
@@ -6,13 +9,14 @@ let {
   SHOW_LOADING,
   SHOW_NOTIFICATION,
   HIDE_NOTIFICATION
-} = require('../actions/app')
-const { merge } = require('@nudj/library')
+} = require('./actions')
 
 const initialState = {}
 
 function appReducer (state = initialState, action) {
   switch (action.type) {
+    case INITIALISED:
+      return merge(state, { initialised: true, notification: action.notification })
     case SENDING:
       return merge(state, { sending: true, notification: null })
     case SHOW_LOADING:
@@ -25,7 +29,7 @@ function appReducer (state = initialState, action) {
     case SHOW_DIALOG:
       return merge(state, { overlay: action.dialog })
     case HIDE_DIALOG:
-      return merge(state, { overlay: undefined })
+      return merge(state, { overlay: null })
     case SHOW_NOTIFICATION:
       return merge(state, { notification: merge(action.notification, { hide: false }) })
     case HIDE_NOTIFICATION:
