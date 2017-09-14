@@ -74,8 +74,8 @@ const getMiddleware = ({
       if (staticContext.url) {
         res.redirect(staticContext.url)
       } else {
-        let status = get(data, 'server.error.code', staticContext.status || 200)
-        let person = get(data, 'server.person')
+        let status = get(data, 'app.error.code', staticContext.status || 200)
+        let person = get(data, 'app.person')
         res.status(status).render('app', {
           data: JSON.stringify(data),
           css: staticContext.css,

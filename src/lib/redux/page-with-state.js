@@ -5,6 +5,7 @@ const { merge } = require('@nudj/library')
 const get = require('lodash/get')
 
 const { initialise } = require('./actions')
+const Loading = require('../components/loading')
 
 class Component extends React.Component {
   componentDidMount () {
@@ -14,9 +15,10 @@ class Component extends React.Component {
     }
   }
   render () {
+    const loading = get(this.props, 'app.loading')
     const Page = this.props.component
     return (
-      <Page {...this.props.app} dispatch={this.props.dispatch} historyAction={this.props.history.action} />
+      loading ? <Loading {...this.props.app} /> : <Page {...this.props.app} dispatch={this.props.dispatch} historyAction={this.props.history.action} />
     )
   }
 }
