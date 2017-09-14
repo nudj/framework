@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html>
+<html class="nojs">
 <head>
   <%= helmet.title.toString() %>
   <%= helmet.meta.toString() %>
@@ -7,6 +7,28 @@
   <link rel='stylesheet' href='https://cdnjs.cloudflare.com/ajax/libs/normalize/7.0.0/normalize.min.css' />
   <link rel='stylesheet' href='/assets/css/reset.css' />
   <script>
+    // mimic modernizr behaviour for script
+    var html = document.querySelector('html')
+    if (html.classList) {
+      html.classList.remove('nojs')
+      html.classList.add('js')
+    }
+    var intercomSettings = {
+      app_id: <%= intercom_app_id %>,
+      custom_launcher_selector: "#open-intercom"
+    }
+    <% if (fullname) { %>
+    intercomSettings.name = <%= fullname %>
+    <% } %>
+    <% if (!fullname && email) { %>
+    intercomSettings.name = <%= email %>
+    <% } %>
+    <% if (email) { %>
+    intercomSettings.email = <%= email %>
+    <% } %>
+    <% if (created_at) { %>
+    intercomSettings.created_at = <%= created_at %>
+    <% } %>
     var data = <%= data %>
     var cssRenderedClassNames = <%= JSON.stringify(css.renderedClassNames) %>
   </script>

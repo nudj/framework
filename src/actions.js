@@ -1,3 +1,3 @@
 module.exports = {
-  app: require('./lib/redux/actions/app')
+  app: require('./lib/redux/actions')
 }

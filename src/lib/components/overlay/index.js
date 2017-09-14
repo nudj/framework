@@ -1,6 +1,6 @@
 const React = require('react')
 const getStyle = require('./overlay.css')
-const { hideDialog } = require('../../redux/actions/app')
+const { hideDialog } = require('../../redux/actions')
 
 function onClickBackground (props) {
   return (event) => props.dispatch(hideDialog())

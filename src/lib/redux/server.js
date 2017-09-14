@@ -8,9 +8,11 @@ const { StyleSheetServer } = require('aphrodite/no-important')
 const thunkMiddleware = require('redux-thunk').default
 const { merge } = require('@nudj/library')
 
-const appReducer = require('./reducers/app')
+const ReduxApp = require('./')
+const appReducer = require('./reducer')
 
 module.exports = ({
+  App,
   reduxRoutes,
   reduxReducers,
   data
@@ -24,14 +26,13 @@ module.exports = ({
   )
   const context = {}
   const { html, css } = StyleSheetServer.renderStatic(() => {
-    const Routes = require('./routes')
     return ReactDOMServer.renderToString(
       <Provider store={store}>
         <StaticRouter
           location={data.app.url.originalUrl}
           context={context}
         >
-          <Routes routes={reduxRoutes} />
+          <ReduxApp {...data.app} App={App} routes={reduxRoutes} />
         </StaticRouter>
       </Provider>
     )

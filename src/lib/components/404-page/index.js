@@ -8,7 +8,7 @@ const NotFound = (props) => {
   return (
     <div className={style.content}>
       <Helmet>
-        <title>ADMIN - oops you're lost</title>
+        <title>nudj - oops you're lost</title>
       </Helmet>
       <img src='https://media.giphy.com/media/k61nOBRRBMxva/giphy.gif' width='320' height='217' />
       <p className={style.header}>Oops!</p>

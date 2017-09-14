@@ -8,16 +8,20 @@ const Auth0Strategy = require('passport-auth0')
 const csrf = require('csurf')
 const redis = require('redis')
 const RedisStore = require('connect-redis')(session)
+const { merge } = require('@nudj/library')
 
 const logger = require('../lib/logger')
 const getMiddleware = require('./lib/middleware')
 
 module.exports = ({
+  App,
   reduxRoutes,
   reduxReducers,
   expressRouters,
   expressAssetPath,
-  mockData
+  mockData,
+  spoofLoggedIn,
+  errorHandlers
 }) => {
   let strategy = new Auth0Strategy({
     domain: process.env.AUTH0_DOMAIN,
@@ -50,10 +54,36 @@ module.exports = ({
     }
   }
   const middlewareOptions = {
+    App,
     reduxRoutes,
     reduxReducers,
-    mockData
+    mockData,
+    spoofLoggedIn,
+    errorHandlers
   }
+  const middleware = getMiddleware(middlewareOptions)
+  const allErrorHandlers = merge(errorHandlers, {
+    'Not found': (req, res, next, error) => {
+      logger.log('warn', 'Page not found', req.url)
+      return {
+        error: {
+          code: 404,
+          type: 'error',
+          message: 'Not found'
+        }
+      }
+    },
+    default: (req, res, next, error) => {
+      logger.log('error', 'Application error', error)
+      return {
+        error: {
+          code: 500,
+          type: 'error',
+          message: 'Something went wrong'
+        }
+      }
+    }
+  })
 
   if (process.env.NODE_ENV === 'production') {
     // add redis persistence to session
@@ -63,8 +93,8 @@ module.exports = ({
   }
   if (process.env.USE_MOCKS === 'true') {
     // start mock api
-    let mockApi = require('../mocks')({ mockData })
-    mockApi.listen(81, () => logger.log('info', 'Mock API running'))
+    let mockApi = require('../mocks')({ data: mockData })
+    mockApi.listen(81, 82, () => logger.log('info', 'Mock APIs running'))
   }
 
   app.engine('html', cons.lodash)
@@ -78,6 +108,12 @@ module.exports = ({
   app.use(session(sessionOpts))
   app.use(passport.initialize())
   app.use(passport.session())
+
+  // add insecure expressRouters
+  expressRouters.insecure.forEach(router => {
+    app.use(router(middleware))
+  })
+
   app.use(csrf({}))
   app.use((req, res, next) => {
     if (req.body && req.body._csrf) {
@@ -89,9 +125,8 @@ module.exports = ({
     next()
   })
 
-  // add expressRouters
-  expressRouters.forEach(router => {
-    const middleware = getMiddleware(middlewareOptions)
+  // add secure expressRouters
+  expressRouters.secure.forEach(router => {
     app.use(router(middleware))
   })
 
@@ -110,17 +145,29 @@ module.exports = ({
   })
 
   app.use((error, req, res, next) => {
-    logger.log('error', 'Application error', error)
-    res.status(500)
-    if (req.accepts('html')) {
-      res.render('500', { url: req.url })
-      return
+    try {
+      let data
+      if (allErrorHandlers[error.message]) {
+        data = allErrorHandlers[error.message](req, res, next, error)
+      } else {
+        data = allErrorHandlers.default(req, res, next, error)
+      }
+      if (data) {
+        middleware.render(req, res, next, data)
+      }
+    } catch (error) {
+      logger.log('error', 'COMPLETE AND UTTER FAILURE', error)
+      res.status(500)
+      if (req.accepts('html')) {
+        res.render('500', { url: req.url })
+        return
+      }
+      if (req.accepts('json')) {
+        res.send({ error: '500: Internal server error' })
+        return
+      }
+      res.type('txt').send('500: Internal server error')
     }
-    if (req.accepts('json')) {
-      res.send({ error: '500: Internal server error' })
-      return
-    }
-    res.type('txt').send('500: Internal server error')
   })
 
   app.listen(80, () => logger.log('info', 'App running'))

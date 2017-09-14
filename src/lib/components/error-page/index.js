@@ -7,7 +7,7 @@ const ServerError = require('../500-page')
 const ErrorPage = (props) => {
   const style = getStyle()
   let html
-  if (props.code === 404) {
+  if (props.error.code === 404) {
     html = <PageNotFound />
   } else {
     html = <ServerError />
