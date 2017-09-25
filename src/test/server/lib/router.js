@@ -26,9 +26,10 @@ describe('Router', () => {
     expressRouterStub = sinon.stub(express, 'Router')
   })
   beforeEach(() => {
-    expressRouter = {
-      get: sinon.stub()
-    }
+    expressRouter = methods.reduce((expressRouter, method) => {
+      expressRouter[method] = sinon.stub()
+      return expressRouter
+    }, {})
     expressRouterStub.returns(expressRouter)
   })
   afterEach(() => {
@@ -53,27 +54,27 @@ describe('Router', () => {
         })
 
         it('should be a function', () => {
-          expect(router.getHandlers).to.be.a('function')
+          expect(router[`${method}Handlers`]).to.be.a('function')
         })
 
-        it('should call express router.get', () => {
-          router.getHandlers('/some/path', 'someHandler')
-          expect(expressRouter.get).to.have.been.called()
+        it(`should call express router.${method}`, () => {
+          router[`${method}Handlers`]('/some/path', 'someHandler')
+          expect(expressRouter[method]).to.have.been.called()
         })
 
-        it('should call express router.get twice', () => {
-          router.getHandlers('/some/path', 'someHandler')
-          expect(expressRouter.get).to.have.been.calledTwice()
+        it(`should call express router.${method} twice`, () => {
+          router[`${method}Handlers`]('/some/path', 'someHandler')
+          expect(expressRouter[method]).to.have.been.calledTwice()
         })
 
-        it('should call express router.get with html params', () => {
-          router.getHandlers('/some/path', 'someHandler')
-          expect(expressRouter.get).to.have.been.calledWith('/some/path', 'someHandler')
+        it(`should call express router.${method} with html params`, () => {
+          router[`${method}Handlers`]('/some/path', 'someHandler')
+          expect(expressRouter[method]).to.have.been.calledWith('/some/path', 'someHandler')
         })
 
-        it('should call express router.get with data params', () => {
-          router.getHandlers('/some/path', 'someHandler')
-          expect(expressRouter.get).to.have.been.calledWith('/some/path/json', 'someHandler')
+        it(`should call express router.${method} with data params`, () => {
+          router[`${method}Handlers`]('/some/path', 'someHandler')
+          expect(expressRouter[method]).to.have.been.calledWith('/some/path/json', 'someHandler')
         })
       })
     })
