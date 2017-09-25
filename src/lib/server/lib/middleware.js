@@ -94,6 +94,7 @@ const getMiddleware = ({
 
   function respondWith (dataFetcher) {
     return (req, res, next) => {
+      dataFetcher = dataFetcher || (() => Promise.resolve({}))
       return dataFetcher({
         data: merge(req.session.data || {}),
         params: req.params,
