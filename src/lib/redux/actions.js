@@ -3,6 +3,7 @@ const get = require('lodash/get')
 const { merge } = require('@nudj/library')
 
 const request = require('../lib/request')
+const { addAjaxPostfix } = require('../lib')
 
 const INITIALISED = 'INITIALISED'
 module.exports.INITIALISED = INITIALISED
@@ -127,9 +128,9 @@ module.exports.postData = ({
   data
 }) => {
   return (dispatch, getState) => {
-    let state = getState()
+    const state = getState()
     dispatch(sending())
-    request(url, {
+    request(addAjaxPostfix(url), {
       method,
       data: merge(data, {
         _csrf: state.app.csrfToken

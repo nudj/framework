@@ -4,6 +4,8 @@ const getTime = require('date-fns/get_time')
 const { merge } = require('@nudj/library')
 
 const app = require('../../redux/server')
+const { removeAjaxPostfix } = require('../../lib')
+const { AJAX_POSTFIX } = require('../../lib/constants')
 
 const getMiddleware = ({
   App,
@@ -46,7 +48,7 @@ const getMiddleware = ({
       data.url = {
         protocol: req.protocol,
         hostname: req.hostname,
-        originalUrl: req.originalUrl
+        originalUrl: removeAjaxPostfix(req.originalUrl)
       }
       data.web = {
         protocol: req.protocol,
@@ -62,7 +64,7 @@ const getMiddleware = ({
     return (data) => {
       delete req.session.logout
       delete req.session.returnTo
-      if (req.xhr) {
+      if (req.path.endsWith(AJAX_POSTFIX)) {
         return res.json(data)
       }
       let staticContext = app({
