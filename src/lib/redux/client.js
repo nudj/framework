@@ -27,6 +27,7 @@ const {
   showError
 } = require('./actions')
 const request = require('../lib/request')
+const { addAjaxPostfix } = require('../lib')
 
 const Client = ({
   App,
@@ -45,8 +46,8 @@ const Client = ({
   )
   const latestRequest = {}
 
-  function fetchData (location, hash, dispatch) {
-    return request(location)
+  function fetchData (url, hash, dispatch) {
+    return request(addAjaxPostfix(url))
       .then((data) => {
         if (data) {
           // only update page state if this is the latest request
