@@ -1,6 +1,6 @@
 source /root/.zsh/zsh-autosuggestions/zsh-autosuggestions.zsh
 
-PROMPT="library» "
+PROMPT="framework» "
 
 alias test="./node_modules/.bin/standard && ./node_modules/.bin/mocha --recursive test"
 alias tdd='./node_modules/.bin/nodemon \

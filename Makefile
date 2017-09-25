@@ -14,6 +14,7 @@ ssh:
 	-@docker rm -f framework-dev 2> /dev/null || true
 	@docker run --rm -it \
 		--name framework-dev \
+		-e NPM_TOKEN=${NPM_TOKEN} \
 		-v $(CWD)/.zshrc:/root/.zshrc \
 		-v $(CWD)/src/lib:/usr/src/lib \
 		-v $(CWD)/src/test:/usr/src/test \
