@@ -3,6 +3,7 @@ const { withRouter } = require('react-router-dom')
 const { connect } = require('react-redux')
 const { merge } = require('@nudj/library')
 const get = require('lodash/get')
+const omit = require('lodash/omit')
 
 const { initialise } = require('./actions')
 const Loading = require('../components/loading')
@@ -16,10 +17,8 @@ class Component extends React.Component {
   }
   render () {
     const loading = get(this.props, 'app.loading')
-    const Page = this.props.component
-    return (
-      loading ? <Loading {...this.props.app} /> : <Page {...this.props.app} dispatch={this.props.dispatch} historyAction={this.props.history.action} />
-    )
+    const Page = loading ? Loading : this.props.component
+    return <Page {...omit(this.props, ['app', 'component'])} {...this.props.app} />
   }
 }
 
