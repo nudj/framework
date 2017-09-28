@@ -159,12 +159,13 @@ module.exports = ({
 
   app.use((error, req, res, next) => {
     try {
-      let data
+      let handler
       if (allErrorHandlers[error.name]) {
-        data = allErrorHandlers[error.name](req, res, next, error)
+        handler = error.name
       } else {
-        data = allErrorHandlers.default(req, res, next, error)
+        handler = default
       }
+      const data = allErrorHandlers[handler](req, res, next, error)
       if (data) {
         middleware.render(req, res, next, data)
       }
