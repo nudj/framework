@@ -163,7 +163,7 @@ module.exports = ({
       if (allErrorHandlers[error.name]) {
         handler = error.name
       } else {
-        handler = default
+        handler = 'default'
       }
       const data = allErrorHandlers[handler](req, res, next, error)
       if (data) {
