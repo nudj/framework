@@ -63,28 +63,39 @@ module.exports = ({
     errorHandlers
   }
   const middleware = getMiddleware(middlewareOptions)
-  const allErrorHandlers = merge(errorHandlers, {
-    'Not found': (req, res, next, error) => {
-      logger.log('warn', 'Page not found', req.url)
-      return {
-        error: {
-          code: 404,
-          type: 'error',
-          message: 'Not found'
-        }
-      }
-    },
-    default: (req, res, next, error) => {
-      logger.log('error', 'Application error', error)
-      return {
-        error: {
-          code: 500,
-          type: 'error',
-          message: 'Something went wrong'
-        }
+  const LogThenRedirect = (req, res, next, error) => {
+    logger.log('error', error.message, ...error.log)
+    req.session.notification = {
+      type: 'error',
+      message: error.message
+    }
+    res.redirect(303, error.url)
+  }
+  const LogThenNotFound = (req, res, next, error) => {
+    logger.log('error', error.message, ...error.log)
+    return {
+      error: {
+        code: 404,
+        type: 'error',
+        message: 'Not found'
       }
     }
-  })
+  }
+  const LogThenError = (req, res, next, error) => {
+    logger.log('error', error.message, ...error.log)
+    return {
+      error: {
+        code: 500,
+        type: 'error',
+        message: 'Something went wrong'
+      }
+    }
+  }
+  const allErrorHandlers = merge({
+    LogThenRedirect,
+    LogThenNotFound,
+    default: LogThenError
+  }, errorHandlers)
 
   if (process.env.NODE_ENV === 'production') {
     // add redis persistence to session
@@ -149,8 +160,8 @@ module.exports = ({
   app.use((error, req, res, next) => {
     try {
       let data
-      if (allErrorHandlers[error.message]) {
-        data = allErrorHandlers[error.message](req, res, next, error)
+      if (allErrorHandlers[error.name]) {
+        data = allErrorHandlers[error.name](req, res, next, error)
       } else {
         data = allErrorHandlers.default(req, res, next, error)
       }
