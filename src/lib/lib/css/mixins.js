@@ -445,3 +445,82 @@ module.exports.sectionDivider = {
   height: variables.sizing.baseBorderWidth,
   margin: `0 ${variables.padding.d} 0 ${variables.padding.d}`
 }
+
+const errorPageCopyLink = merge(module.exports.headings.p, {
+  color: variables.colors.royalBlue,
+  margin: '0',
+  textDecoration: 'underline'
+})
+
+module.exports.errorPages = {
+  body: {
+    overflow: 'hidden',
+    padding: `${variables.padding.d} ${variables.padding.d} ${variables.padding.c} ${variables.padding.d}`,
+    '::before': {
+      backgroundColor: 'transparent',
+      backgroundImage: linkImage('nudj-logo-new.svg'),
+      backgroundPosition: 'left top',
+      backgroundRepeat: 'no-repeat',
+      backgroundSize: 'auto',
+      content: `''`,
+      display: 'block',
+      height: '78px',
+      maxWidth: variables.sizing.contentMaxWidth,
+      margin: `0 auto ${variables.padding.c} auto`,
+      pointerEvents: 'none',
+      position: 'relative',
+      width: '100%'
+    }
+  },
+  content: {
+    alignItems: 'center',
+    display: 'flex',
+    flexDirection: 'column',
+    justifyContent: 'center',
+    textAlign: 'center',
+    padding: `0 0 200px 0`,
+    position: 'relative',
+    [breakpoints.m]: {
+      margin: '0 auto',
+      maxWidth: variables.sizing.contentMediumMaxWidth
+    },
+    '::after': {
+      backgroundColor: 'transparent',
+      backgroundImage: linkImage('thumbs-down.svg'),
+      backgroundPosition: 'right center',
+      backgroundRepeat: 'no-repeat',
+      backgroundSize: 'auto',
+      bottom: '0',
+      content: `''`,
+      display: 'block',
+      height: '151px',
+      left: '50%',
+      pointerEvents: 'none',
+      position: 'absolute',
+      width: '689px'
+    }
+  },
+  header: {
+    position: 'relative'
+  },
+  title: merge(module.exports.typography.h1, {
+    color: variables.colors.royalBlue,
+    fontSize: '100px',
+    [breakpoints.ns]: {
+      fontSize: '160px'
+    }
+  }),
+  copy: merge(module.exports.typography.p),
+  pages: {
+    padding: `0 0 ${variables.padding.d} 0`
+  },
+  copyLink: errorPageCopyLink,
+  link: merge(errorPageCopyLink, {
+    display: 'block',
+    padding: `0 0 ${variables.padding.e} 0`,
+    [breakpoints.l]: {
+      display: 'inline-block',
+      padding: variables.padding.e
+    }
+  })
+}
