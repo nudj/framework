@@ -27,7 +27,9 @@ module.exports.sizing = {
   squishedSidebarWidth: '160px',
   notificationTop: `${basePixelSize * 1.5}px`,
   textEditorLineHeight: '1.5rem',
-  buttonMinWidth: '120px'
+  buttonMinWidth: '120px',
+  contentMaxWidth: '980px',
+  contentMediumMaxWidth: '560px'
 }
 
 module.exports.padding = {

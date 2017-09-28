@@ -8,16 +8,16 @@ const ServerError = (props) => {
   return (
     <div className={style.content}>
       <Helmet>
+        <meta charSet='utf-8' />
         <title>nudj - something went wrong</title>
+        <meta name='viewport' content='width=device-width, initial-scale=1' />
       </Helmet>
-      <div className={style.gif}>
-        <img src='https://media.giphy.com/media/ZeB4HcMpsyDo4/giphy.gif' width='320' height='202' />
-      </div>
-      <p className={style.header}>Dang-it!</p>
+      <header className={style.header}>
+        <h1 className={style.title}>500</h1>
+      </header>
       <p className={style.copy}>That wasn't supposed to happen.</p>
-      <small className={style.error}>Error code: 500</small>
       <p className={style.copy}>An error has occurred and we're working to fix the problem! We’ll be up and running again shortly.</p>
-      <p className={style.copy}>If you need immediate help, then please <Link className={style.link} to='' id='open-intercom'>contact us</Link>.</p>
+      <p className={style.copy}>If you need immediate help, then please <Link className={style.copyLink} to='' id='open-intercom'>contact us</Link>. Otherwise try going back or visit our <Link className={style.copyLink} to='/'>home page</Link>.</p>
     </div>
   )
 }
