@@ -91,10 +91,20 @@ module.exports = ({
       }
     }
   }
+  const GenericError = (req, res, next, error) => {
+    logger.log('error', error.name, error.message)
+    return {
+      error: {
+        code: 500,
+        type: 'error',
+        message: 'Something went wrong'
+      }
+    }
+  }
   const allErrorHandlers = merge({
     LogThenRedirect,
     LogThenNotFound,
-    default: LogThenError
+    GenericError
   }, errorHandlers)
 
   if (process.env.REDIS_SESSION === 'true') {
@@ -163,7 +173,7 @@ module.exports = ({
       if (allErrorHandlers[error.name]) {
         handler = error.name
       } else {
-        handler = 'default'
+        handler = 'GenericError'
       }
       const data = allErrorHandlers[handler](req, res, next, error)
       if (data) {
