@@ -29,6 +29,8 @@ const {
 const request = require('../lib/request')
 const { addAjaxPostfix } = require('../lib')
 
+console.log('Client', 'process.env.NODE_ENV', process.env.NODE_ENV)
+
 const Client = ({
   App,
   reduxRoutes,

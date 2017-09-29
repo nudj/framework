@@ -10,6 +10,9 @@ const { merge } = require('@nudj/library')
 
 const ReduxApp = require('./')
 const appReducer = require('./reducer')
+const logger = require('../lib/logger')
+
+logger.log('info', 'Server', 'process.env.NODE_ENV', process.env.NODE_ENV)
 
 module.exports = ({
   App,
