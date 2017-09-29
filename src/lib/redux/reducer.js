@@ -8,7 +8,8 @@ const {
   HIDE_DIALOG,
   SHOW_LOADING,
   SHOW_NOTIFICATION,
-  HIDE_NOTIFICATION
+  HIDE_NOTIFICATION,
+  SHOW_ERROR
 } = require('./actions')
 
 const initialState = {}
@@ -34,6 +35,8 @@ function appReducer (state = initialState, action) {
       return merge(state, { notification: merge(action.notification, { hide: false }) })
     case HIDE_NOTIFICATION:
       return merge(state, { notification: { hide: true, timer: false } })
+    case SHOW_ERROR:
+      return merge(state, { error: { code: 500 }, loading: false })
     default:
       return state
   }
