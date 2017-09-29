@@ -97,7 +97,7 @@ module.exports = ({
     default: LogThenError
   }, errorHandlers)
 
-  if (process.env.NODE_ENV === 'production') {
+  if (process.env.REDIS_SESSION === 'true') {
     // add redis persistence to session
     sessionOpts.store = new RedisStore({
       client: redis.createClient(6379, 'redis')

@@ -1,7 +1,7 @@
 let winston = require('winston')
 
 winston.configure({
-  level: process.env.NODE_ENV === 'production' ? 'info' : 'silly',
+  level: process.env.LOG_LEVEL || 'info',
   transports: [
     new winston.transports.Console({
       handleExceptions: true,
