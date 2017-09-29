@@ -104,6 +104,7 @@ module.exports = ({
   const allErrorHandlers = merge({
     LogThenRedirect,
     LogThenNotFound,
+    LogThenError,
     GenericError
   }, errorHandlers)
 
