@@ -6,6 +6,8 @@ const get = require('lodash/get')
 const omit = require('lodash/omit')
 
 const { initialise } = require('./actions')
+const Status = require('../components/status')
+const ErrorPage = require('../components/error-page')
 const Loading = require('../components/loading')
 
 class Component extends React.Component {
@@ -16,8 +18,23 @@ class Component extends React.Component {
     }
   }
   render () {
+    const error = get(this.props, 'app.error')
     const loading = get(this.props, 'app.loading')
-    const Page = loading ? Loading : this.props.component
+    let Page
+    switch (true) {
+      case !!error:
+        Page = (props) => (
+          <Status code={error.code}>
+            <ErrorPage error={error} />
+          </Status>
+        )
+        break
+      case !!loading:
+        Page = Loading
+        break
+      default:
+        Page = this.props.component
+    }
     return <Page {...omit(this.props, ['app', 'component'])} {...this.props.app} />
   }
 }

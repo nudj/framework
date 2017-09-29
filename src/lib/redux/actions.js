@@ -109,6 +109,19 @@ module.exports.showNotification = (notification) => {
   }
 }
 
+const SHOW_ERROR = 'SHOW_ERROR'
+module.exports.SHOW_ERROR = SHOW_ERROR
+function showError () {
+  return {
+    type: SHOW_ERROR
+  }
+}
+module.exports.showError = () => {
+  return (dispatch, getState) => {
+    dispatch(showError())
+  }
+}
+
 const HIDE_NOTIFICATION = 'HIDE_NOTIFICATION'
 module.exports.HIDE_NOTIFICATION = HIDE_NOTIFICATION
 function hideNotification () {
