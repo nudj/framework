@@ -1,6 +1,7 @@
 const path = require('path')
 const express = require('express')
 const bodyParser = require('body-parser')
+const fileUpload = require('express-fileupload')
 const cons = require('consolidate')
 const session = require('express-session')
 const favicon = require('serve-favicon')
@@ -13,6 +14,10 @@ const { merge } = require('@nudj/library')
 
 const logger = require('../lib/logger')
 const getMiddleware = require('./lib/middleware')
+const {
+  isAjax,
+  addAjaxPostfix
+} = require('../lib')
 
 module.exports = ({
   App,
@@ -20,6 +25,7 @@ module.exports = ({
   reduxReducers,
   expressRouters,
   expressAssetPath,
+  buildAssetPath,
   mockData,
   spoofLoggedIn,
   errorHandlers
@@ -45,10 +51,10 @@ module.exports = ({
     resave: true,
     saveUninitialized: true
   }
-  const customAssetOptions = {
+  const dynamicAssetOptions = {
     index: false
   }
-  const frameworkAssetOptions = {
+  const cachedAssetOptions = {
     index: false,
     setHeaders: (res, path) => {
       res.setHeader('Cache-Control', 'public, max-age=31536000')
@@ -63,16 +69,20 @@ module.exports = ({
     errorHandlers
   }
   const middleware = getMiddleware(middlewareOptions)
-  const LogThenRedirect = (req, res, next, error) => {
-    logger.log('error', error.message, ...error.log)
-    req.session.notification = {
-      type: 'error',
-      message: error.message
+  const Redirect = (req, res, next, options) => {
+    console.log(options)
+    if (options.notification) {
+      req.session.notification = options.notification
     }
-    res.redirect(303, error.url)
+    let redirectUrl = options.url
+    if (isAjax(req.originalUrl)) {
+      redirectUrl = addAjaxPostfix(redirectUrl)
+    }
+    logger.log('info', `Redirect - From: ${req.originalUrl}, To: ${redirectUrl}`, ...options.log)
+    res.redirect(303, redirectUrl)
   }
-  const LogThenNotFound = (req, res, next, error) => {
-    logger.log('error', error.message, ...error.log)
+  const NotFound = (req, res, next, options) => {
+    logger.log('warn', `NotFound - ${req.originalUrl}`, ...options.log)
     return {
       error: {
         code: 404,
@@ -81,8 +91,12 @@ module.exports = ({
       }
     }
   }
-  const LogThenError = (req, res, next, error) => {
-    logger.log('error', error.message, ...error.log)
+  const Unauthorized = (req, res, next, options) => {
+    logger.log('warn', `Unauthorized - ${options.type}`, ...options.log)
+    res.status(401).send(options.type)
+  }
+  const AppError = (req, res, next, options) => {
+    logger.log('error', 'AppError', ...options.log, options.stack)
     return {
       error: {
         code: 500,
@@ -92,7 +106,7 @@ module.exports = ({
     }
   }
   const GenericError = (req, res, next, error) => {
-    logger.log('error', error.name, error.message)
+    logger.log('error', 'GenericError', error.name, error.message, error.stack)
     return {
       error: {
         code: 500,
@@ -102,9 +116,10 @@ module.exports = ({
     }
   }
   const allErrorHandlers = merge({
-    LogThenRedirect,
-    LogThenNotFound,
-    LogThenError,
+    Redirect,
+    NotFound,
+    Unauthorized,
+    AppError,
     GenericError
   }, errorHandlers)
 
@@ -127,8 +142,9 @@ module.exports = ({
   app.use(favicon(path.join(__dirname, 'assets/images/nudj-square.ico')))
   app.use(bodyParser.urlencoded({ extended: false }))
   app.use(bodyParser.json())
-  app.use('/assets', express.static(expressAssetPath, customAssetOptions))
-  app.use('/assets', express.static(path.join(__dirname, 'assets'), frameworkAssetOptions))
+  app.use('/build', express.static(buildAssetPath, dynamicAssetOptions))
+  app.use('/assets', express.static(expressAssetPath, cachedAssetOptions))
+  app.use('/assets', express.static(path.join(__dirname, 'assets'), cachedAssetOptions))
   app.use(session(sessionOpts))
   app.use(passport.initialize())
   app.use(passport.session())
@@ -138,6 +154,7 @@ module.exports = ({
     app.use(router(middleware))
   })
 
+  app.use(fileUpload())
   app.use(csrf({}))
   app.use((req, res, next) => {
     if (req.body && req.body._csrf) {
