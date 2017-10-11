@@ -70,7 +70,6 @@ module.exports = ({
   }
   const middleware = getMiddleware(middlewareOptions)
   const Redirect = (req, res, next, options) => {
-    console.log(options)
     if (options.notification) {
       req.session.notification = options.notification
     }
