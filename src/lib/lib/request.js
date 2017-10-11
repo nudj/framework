@@ -28,7 +28,7 @@ function request (uri, options) {
   return axios(uri, options)
     .then((response) => response.data)
     .catch((error) => {
-      switch(get(error, 'response.status')) {
+      switch (get(error, 'response.status')) {
         case 401:
           throw new Unauthorized({ type: error.response.data })
         case 404:
