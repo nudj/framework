@@ -165,7 +165,6 @@ module.exports.postData = ({
       }
     })
     .catch((error) => {
-      console.error(error)
       const authorities = {
         nudj: '',
         Google: '/auth/google'
