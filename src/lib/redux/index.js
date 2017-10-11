@@ -1,7 +1,7 @@
 const React = require('react')
 const { Switch, Route } = require('react-router-dom')
 
-const PageWithState = require('./page-with-state')
+const pageWithStateInit = require('./page-with-state')
 const Status = require('../components/status')
 const ErrorPage = require('../components/error-page')
 
@@ -9,8 +9,9 @@ const objectMapToArray = (obj, fn) => {
   return Object.keys(obj).map(key => fn(key, obj[key]))
 }
 
-const FrameworkReduxRoot = (props) => {
+const FrameworkReduxRoot = ({ LoadingComponent }) => (props) => {
   const App = props.App
+  const PageWithState = pageWithStateInit({ LoadingComponent })
 
   return (
     <App>

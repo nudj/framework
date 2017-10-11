@@ -8,7 +8,7 @@ const { StyleSheetServer } = require('aphrodite/no-important')
 const thunkMiddleware = require('redux-thunk').default
 const { merge } = require('@nudj/library')
 
-const ReduxApp = require('./')
+const reduxInit = require('./')
 const appReducer = require('./reducer')
 const logger = require('../lib/logger')
 
@@ -18,8 +18,10 @@ module.exports = ({
   App,
   reduxRoutes,
   reduxReducers,
-  data
+  data,
+  LoadingComponent
 }) => {
+  const ReduxApp = reduxInit({ LoadingComponent })
   const store = createStore(
     combineReducers(merge({
       app: appReducer

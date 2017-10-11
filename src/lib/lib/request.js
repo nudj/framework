@@ -2,6 +2,11 @@
 
 const Axios = require('axios')
 const get = require('lodash/get')
+const {
+  Unauthorized,
+  NotFound,
+  AppError
+} = require('./errors')
 
 let config = {
   baseURL: '/',
@@ -23,11 +28,14 @@ function request (uri, options) {
   return axios(uri, options)
     .then((response) => response.data)
     .catch((error) => {
-      if (get(error, 'response.status') === 401) {
-        throw new Error('Unauthorized')
+      switch(get(error, 'response.status')) {
+        case 401:
+          throw new Unauthorized({ type: error.response.data })
+        case 404:
+          throw new NotFound(`request - ${config.baseURL}${uri}`, options)
+        default:
+          throw new AppError(error.message, `request - ${config.baseURL}${uri}`, options)
       }
-      console.log('error', error.message, `request - ${config.baseURL}${uri}`, options)
-      throw new Error('Something went wrong')
     })
 }
 

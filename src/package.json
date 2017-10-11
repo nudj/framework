@@ -37,6 +37,7 @@
     "csurf": "^1.9.0",
     "date-fns": "^1.28.3",
     "express": "^4.14.1",
+    "express-fileupload": "^0.3.0",
     "express-session": "^1.15.1",
     "express-urlrewrite": "^1.2.0",
     "form-serialize": "^0.7.1",
