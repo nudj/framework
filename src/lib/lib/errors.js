@@ -1,30 +1,37 @@
-function LogThenRedirect (message, url, ...log) {
-  this.name = 'LogThenRedirect'
-  this.message = message
+function Redirect ({ url, notification }, ...log) {
+  this.name = 'Redirect'
   this.url = url
+  this.notification = notification
   this.log = log
 }
-LogThenRedirect.prototype = Object.create(Error.prototype)
-LogThenRedirect.prototype.constructor = LogThenRedirect
+Redirect.prototype = Object.create(Error.prototype)
+Redirect.prototype.constructor = Redirect
 
-function LogThenError (message, ...log) {
-  this.name = 'LogThenError'
-  this.message = message
+function NotFound (...log) {
+  this.name = 'NotFound'
   this.log = log
 }
-LogThenError.prototype = Object.create(Error.prototype)
-LogThenError.prototype.constructor = LogThenError
+NotFound.prototype = Object.create(Error.prototype)
+NotFound.prototype.constructor = NotFound
 
-function LogThenNotFound (message, ...log) {
-  this.name = 'LogThenNotFound'
-  this.message = message
+function Unauthorized ({ type }, ...log) {
+  this.name = 'Unauthorized'
+  this.type = type
   this.log = log
 }
-LogThenNotFound.prototype = Object.create(Error.prototype)
-LogThenNotFound.prototype.constructor = LogThenNotFound
+Unauthorized.prototype = Object.create(Error.prototype)
+Unauthorized.prototype.constructor = Unauthorized
+
+function AppError (...log) {
+  this.name = 'AppError'
+  this.log = log
+}
+AppError.prototype = Object.create(Error.prototype)
+AppError.prototype.constructor = AppError
 
 module.exports = {
-  LogThenRedirect,
-  LogThenError,
-  LogThenNotFound
+  Redirect,
+  NotFound,
+  Unauthorized,
+  AppError
 }

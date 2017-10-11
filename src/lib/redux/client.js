@@ -19,7 +19,7 @@ const thunkMiddleware = require('redux-thunk').default
 const { StyleSheet } = require('aphrodite/no-important')
 const { merge } = require('@nudj/library')
 
-const ReduxApp = require('./')
+const reduxInit = require('./')
 const appReducer = require('./reducer')
 const {
   setPage,
@@ -34,7 +34,8 @@ console.log('Client', 'process.env.NODE_ENV', process.env.NODE_ENV)
 const Client = ({
   App,
   reduxRoutes,
-  reduxReducers
+  reduxReducers,
+  LoadingComponent
 }) => {
   const history = createBrowserHistory()
   const historyMiddleware = routerMiddleware(history)
@@ -47,6 +48,7 @@ const Client = ({
     applyMiddleware(thunkMiddleware, historyMiddleware)
   )
   const latestRequest = {}
+  const ReduxApp = reduxInit({ LoadingComponent })
 
   function fetchData (url, hash, dispatch) {
     return request(addAjaxPostfix(url))
@@ -64,9 +66,13 @@ const Client = ({
       })
       .catch((error) => {
         console.error(error)
-        if (error.message === 'Unauthorized') {
-          // refresh the page to trigger a login redirection
-          window.location = ''
+        const authorities = {
+          nudj: '',
+          Google: '/auth/google'
+        }
+        if (error.message.startsWith('Unauthorized')) {
+          const authority = error.message.split(' ')[1]
+          window.location = (authority && authorities[authority]) || authorities.nudj
           return
         }
         dispatch(showError())

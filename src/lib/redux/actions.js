@@ -1,9 +1,13 @@
-const { push } = require('@nudj/react-router-redux')
+const { replace } = require('@nudj/react-router-redux')
 const get = require('lodash/get')
 const { merge } = require('@nudj/library')
 
 const request = require('../lib/request')
 const { addAjaxPostfix } = require('../lib')
+const {
+  Unauthorized,
+  NotFound
+} = require('../lib/errors')
 
 const INITIALISED = 'INITIALISED'
 module.exports.INITIALISED = INITIALISED
@@ -35,19 +39,6 @@ function fetchedPage (data) {
 module.exports.setPage = (data) => {
   return (dispatch, getState) => {
     dispatch(fetchedPage(data))
-  }
-}
-
-const SENDING = 'SENDING'
-module.exports.SENDING = SENDING
-function sending () {
-  return {
-    type: SENDING
-  }
-}
-module.exports.sending = () => {
-  return (dispatch, getState) => {
-    dispatch(sending())
   }
 }
 
@@ -122,6 +113,19 @@ module.exports.showError = () => {
   }
 }
 
+const SHOW_NOT_FOUND = 'SHOW_NOT_FOUND'
+module.exports.SHOW_NOT_FOUND = SHOW_NOT_FOUND
+function showNotFound () {
+  return {
+    type: SHOW_NOT_FOUND
+  }
+}
+module.exports.showNotFound = () => {
+  return (dispatch, getState) => {
+    dispatch(showNotFound())
+  }
+}
+
 const HIDE_NOTIFICATION = 'HIDE_NOTIFICATION'
 module.exports.HIDE_NOTIFICATION = HIDE_NOTIFICATION
 function hideNotification () {
@@ -142,7 +146,8 @@ module.exports.postData = ({
 }) => {
   return (dispatch, getState) => {
     const state = getState()
-    dispatch(sending())
+    dispatch(hideDialog())
+    dispatch(showLoading())
     request(addAjaxPostfix(url), {
       method,
       data: merge(data, {
@@ -156,7 +161,53 @@ module.exports.postData = ({
       }
       dispatch(fetchedPage(data))
       if (data.app.url.originalUrl !== url) {
-        dispatch(push(data.app.url.originalUrl))
+        dispatch(replace(data.app.url.originalUrl))
+      }
+    })
+    .catch((error) => {
+      const authorities = {
+        nudj: '',
+        Google: '/auth/google'
+      }
+      if (error instanceof Unauthorized) {
+        const authority = error.type
+        window.location = (authority && authorities[authority]) || authorities.nudj
+        return
+      }
+      if (error instanceof NotFound) {
+        return dispatch(showNotFound())
+      }
+      dispatch(showError())
+    })
+  }
+}
+
+module.exports.postFile = ({
+  url,
+  method = 'post',
+  file,
+  data
+}) => {
+  const formData = new window.FormData()
+  formData.append('file', file)
+  Object.keys(data).forEach(key => {
+    formData.append(key, data[key])
+  })
+
+  return (dispatch, getState) => {
+    const state = getState()
+    formData.append('_csrf', state.app.csrfToken)
+
+    dispatch(hideDialog())
+    dispatch(showLoading())
+    request(addAjaxPostfix(url), {
+      method,
+      data: formData
+    })
+    .then((data) => {
+      dispatch(fetchedPage(data))
+      if (data.app.url.originalUrl !== url) {
+        dispatch(replace(data.app.url.originalUrl))
       }
     })
   }

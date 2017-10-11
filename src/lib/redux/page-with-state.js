@@ -30,17 +30,17 @@ class Component extends React.Component {
         )
         break
       case !!loading:
-        Page = Loading
+        Page = this.props.loadingComponent || Loading
         break
       default:
         Page = this.props.component
     }
-    return <Page {...omit(this.props, ['app', 'component'])} {...this.props.app} />
+    return <Page {...omit(this.props, ['app', 'component', 'loadingComponent'])} {...this.props.app} />
   }
 }
 
-const PageWithState = (Page) => {
-  return withRouter(connect(merge)((props) => <Component component={Page} {...props} />))
+const PageWithState = ({ LoadingComponent }) => (Page) => {
+  return withRouter(connect(merge)((props) => <Component component={Page} loadingComponent={LoadingComponent} {...props} />))
 }
 
 module.exports = PageWithState

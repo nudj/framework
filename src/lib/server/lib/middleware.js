@@ -34,36 +34,31 @@ const getMiddleware = ({
   const spoofUser = process.env.SPOOF_USER === 'true'
   const ensureLoggedIn = spoofUser ? spoofLoggedIn : doEnsureLoggedIn
 
-  function getRenderDataBuilder (req) {
-    return (data) => {
-      data.csrfToken = req.csrfToken()
-      if (req.session.data) {
-        req.session.data.person = data.person || req.session.data.person
-        data.person = req.session.data.person
-      }
-      if (req.session.notification) {
-        data.notification = req.session.notification
-        delete req.session.notification
-      }
-      data.url = {
+  function initialData (req, data = {}) {
+    data = merge(data, req.session.data || {}, {
+      csrfToken: req.csrfToken(),
+      url: {
         protocol: req.protocol,
         hostname: req.hostname,
         originalUrl: removeAjaxPostfix(req.originalUrl)
-      }
-      data.web = {
+      },
+      web: {
         protocol: req.protocol,
         hostname: process.env.WEB_HOSTNAME
       }
-      return {
-        app: data
-      }
+    })
+    if (req.session.notification) {
+      data.notification = req.session.notification
+      delete req.session.notification
     }
+    return data
   }
 
   function getRenderer (req, res, next) {
     return (data) => {
       delete req.session.logout
       delete req.session.returnTo
+      data = { app: data }
       if (req.path.endsWith(AJAX_POSTFIX)) {
         return res.json(data)
       }
@@ -96,19 +91,19 @@ const getMiddleware = ({
     return (req, res, next) => {
       dataFetcher = dataFetcher || (() => Promise.resolve({}))
       return dataFetcher({
-        data: merge(req.session.data || {}),
+        data: initialData(req),
         params: req.params,
         body: req.body,
+        query: req.query,
         req
       })
-      .then(getRenderDataBuilder(req, res, next))
       .then(getRenderer(req, res, next))
       .catch(next)
     }
   }
 
   function render (req, res, next, data) {
-    data = getRenderDataBuilder(req, res, next)(data)
+    data = initialData(req, data)
     getRenderer(req, res, next)(data)
   }
 
