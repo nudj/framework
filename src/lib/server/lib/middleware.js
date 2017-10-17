@@ -89,7 +89,7 @@ const getMiddleware = ({
 
   function respondWith (dataFetcher) {
     return (req, res, next) => {
-      dataFetcher = dataFetcher || (() => Promise.resolve({}))
+      dataFetcher = dataFetcher || (({ data }) => Promise.resolve(data))
       return dataFetcher({
         data: initialData(req),
         params: req.params,
