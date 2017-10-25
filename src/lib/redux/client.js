@@ -16,6 +16,7 @@ const {
   replace
 } = require('@nudj/react-router-redux')
 const thunkMiddleware = require('redux-thunk').default
+const { composeWithDevTools } = require('redux-devtools-extension')
 const { StyleSheet } = require('aphrodite/no-important')
 const { merge } = require('@nudj/library')
 
@@ -45,7 +46,7 @@ const Client = ({
       app: appReducer
     }, reduxReducers)),
     data,
-    applyMiddleware(thunkMiddleware, historyMiddleware)
+    composeWithDevTools(applyMiddleware(thunkMiddleware, historyMiddleware))
   )
   const latestRequest = {}
   const ReduxApp = reduxInit({ LoadingComponent })
