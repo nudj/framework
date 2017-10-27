@@ -1,4 +1,4 @@
-const { replace } = require('@nudj/react-router-redux')
+const { push } = require('@nudj/react-router-redux')
 const get = require('lodash/get')
 const { merge } = require('@nudj/library')
 
@@ -161,7 +161,7 @@ module.exports.postData = ({
       }
       dispatch(fetchedPage(data))
       if (data.app.url.originalUrl !== url) {
-        dispatch(replace(data.app.url.originalUrl))
+        dispatch(push(data.app.url.originalUrl))
       }
     })
     .catch((error) => {
@@ -207,7 +207,7 @@ module.exports.postFile = ({
     .then((data) => {
       dispatch(fetchedPage(data))
       if (data.app.url.originalUrl !== url) {
-        dispatch(replace(data.app.url.originalUrl))
+        dispatch(push(data.app.url.originalUrl))
       }
     })
   }
