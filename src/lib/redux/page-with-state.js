@@ -29,7 +29,7 @@ class Component extends React.Component {
           </Status>
         )
         break
-      case !!loading:
+      case !!loading && !this.props.component.handlesLoading:
         Page = this.props.loadingComponent || Loading
         break
       default:
