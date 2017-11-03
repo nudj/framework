@@ -143,7 +143,7 @@ module.exports.postData = ({
   url,
   method = 'post',
   data
-}) => {
+}, callback) => {
   return (dispatch, getState) => {
     const state = getState()
     dispatch(hideDialog())
@@ -162,6 +162,8 @@ module.exports.postData = ({
       dispatch(fetchedPage(data))
       if (data.app.url.originalUrl !== url) {
         dispatch(push(data.app.url.originalUrl))
+      } else {
+        callback && callback()
       }
     })
     .catch((error) => {
