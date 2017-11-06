@@ -36,7 +36,7 @@ const getMiddleware = ({
 
   function initialData (req, data = {}) {
     data = merge(data, req.session.data || {}, {
-      csrfToken: req.csrfToken(),
+      csrfToken: req.csrfToken && req.csrfToken(),
       url: {
         protocol: req.protocol,
         hostname: req.hostname,
