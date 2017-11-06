@@ -86,8 +86,8 @@ const Client = ({
       <ConnectedRouter history={history} onChange={(dispatch, location, historyAction) => {
         const url = location.pathname
         const hash = location.key
-        // ignore replace actions to reserve them for updating the url only
-        if (historyAction !== 'REPLACE') {
+        const state = store.getState()
+        if (url !== state.app.url.originalUrl) {
           dispatch(showLoading())
           latestRequest.hash = hash
           latestRequest.url = url
