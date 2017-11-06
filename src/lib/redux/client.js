@@ -25,10 +25,15 @@ const appReducer = require('./reducer')
 const {
   setPage,
   showLoading,
-  showError
+  showError,
+  showNotFound
 } = require('./actions')
 const request = require('../lib/request')
 const { addAjaxPostfix } = require('../lib')
+const {
+  Unauthorized,
+  NotFound
+} = require('../lib/errors')
 
 console.log('Client', 'process.env.NODE_ENV', process.env.NODE_ENV)
 
@@ -71,10 +76,13 @@ const Client = ({
           nudj: '',
           Google: '/auth/google'
         }
-        if (error.message.startsWith('Unauthorized')) {
-          const authority = error.message.split(' ')[1]
+        if (error.name === Unauthorized.name) {
+          const authority = error.type
           window.location = (authority && authorities[authority]) || authorities.nudj
           return
+        }
+        if (error.name === NotFound.name) {
+          return dispatch(showNotFound())
         }
         dispatch(showError())
       })

@@ -171,12 +171,12 @@ module.exports.postData = ({
         nudj: '',
         Google: '/auth/google'
       }
-      if (error instanceof Unauthorized) {
+      if (error.name === Unauthorized.name) {
         const authority = error.type
         window.location = (authority && authorities[authority]) || authorities.nudj
         return
       }
-      if (error instanceof NotFound) {
+      if (error.name === NotFound.name) {
         return dispatch(showNotFound())
       }
       dispatch(showError())
