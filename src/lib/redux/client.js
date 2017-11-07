@@ -76,12 +76,12 @@ const Client = ({
           nudj: '',
           Google: '/auth/google'
         }
-        if (error.name === Unauthorized.name) {
+        if (error.name === Unauthorized.prototype.name) {
           const authority = error.type
           window.location = (authority && authorities[authority]) || authorities.nudj
           return
         }
-        if (error.name === NotFound.name) {
+        if (error.name === NotFound.prototype.name) {
           return dispatch(showNotFound())
         }
         dispatch(showError())
