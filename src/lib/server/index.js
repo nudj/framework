@@ -19,6 +19,11 @@ const {
   addAjaxPostfix
 } = require('../lib')
 
+process.on('unhandledRejection', error => {
+  // Will print "unhandledRejection err is not defined"
+  console.log('unhandledRejection', error)
+})
+
 module.exports = ({
   App,
   reduxRoutes,
@@ -28,7 +33,8 @@ module.exports = ({
   buildAssetPath,
   mockData,
   spoofLoggedIn,
-  errorHandlers
+  errorHandlers,
+  gqlFragments
 }) => {
   let strategy = new Auth0Strategy({
     domain: process.env.AUTH0_DOMAIN,
@@ -66,7 +72,8 @@ module.exports = ({
     reduxReducers,
     mockData,
     spoofLoggedIn,
-    errorHandlers
+    errorHandlers,
+    gqlFragments
   }
   const middleware = getMiddleware(middlewareOptions)
   const Redirect = (req, res, next, options) => {
