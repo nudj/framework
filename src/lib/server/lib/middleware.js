@@ -30,7 +30,11 @@ const getMiddleware = ({
           return res.status(401).send()
         }
       }
-      _ensureLoggedIn.ensureLoggedIn({ setReturnTo: !req.session.returnTo })(req, res, next)
+      _ensureLoggedIn.ensureLoggedIn({ setReturnTo: !req.session.returnTo })(
+        req,
+        res,
+        next
+      )
     }
     delete req.session.logout
   }
@@ -44,18 +48,15 @@ const getMiddleware = ({
         // fetch page data based on given gql query
         let pageData = {}
         if (gqlQueryComposer) {
-          const {
-            gql,
-            variables,
-            respond
-          } = gqlQueryComposer({
+          const { gql, variables, respond } = await gqlQueryComposer({
             params: req.params,
             body: req.body,
+            files: req.files,
             query: req.query,
             session: req.session
           })
           pageData = await request(gql, variables)
-          if (respond) return respond(pageData)
+          if (respond) return await respond(pageData)
         }
         render(req, res, next, pageData)
       } catch (error) {
@@ -106,7 +107,11 @@ const getMiddleware = ({
     if (staticContext.url) {
       res.redirect(staticContext.url)
     } else {
-      let status = get(renderData, 'app.error.code', staticContext.status || 200)
+      let status = get(
+        renderData,
+        'app.error.code',
+        staticContext.status || 200
+      )
       let person = get(renderData, 'app.person')
       res.status(status).render('app', {
         data: JSON.stringify(renderData),
@@ -114,9 +119,13 @@ const getMiddleware = ({
         html: staticContext.html,
         helmet: staticContext.helmet,
         intercom_app_id: `'${process.env.INTERCOM_APP_ID}'`,
-        fullname: person && person.firstName && person.lastName && `'${person.firstName} ${person.lastName}'`,
+        fullname:
+          person &&
+          person.firstName &&
+          person.lastName &&
+          `'${person.firstName} ${person.lastName}'`,
         email: person && `'${person.email}'`,
-        created_at: person && (getTime(person.created) / 1000)
+        created_at: person && getTime(person.created) / 1000
       })
     }
   }
