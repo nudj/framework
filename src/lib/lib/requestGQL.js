@@ -1,26 +1,29 @@
-const libRequest = require('@nudj/library/lib/request')
+const libRequest = require('@nudj/library/request')
 const get = require('lodash/get')
-const logger = require('@nudj/framework/logger')
+const logger = require('./logger')
 
-function request (query, variables) {
-  return libRequest(`http://${process.env.API_HOST}:82/`, {
-    method: 'post',
-    data: {
-      query,
-      variables
+async function request (query, variables) {
+  try {
+    const response = await libRequest(`http://${process.env.API_HOST}:82/`, {
+      method: 'post',
+      data: {
+        query,
+        variables
+      }
+    })
+    if (response.errors) {
+      response.errors.forEach(error =>
+        logger.log('error', error.message, query, variables)
+      )
+      throw new Error(response.errors[0].message)
     }
-  })
-  .then(data => {
-    if (data.errors) {
-      data.errors.forEach(error => logger.log('error', error.message, query, variables))
-      throw new Error(data.errors[0].message)
-    }
-    return data.data
-  })
-  .catch(error => {
-    get(error, 'response.data.errors', []).forEach(error => logger.log('error', error))
+    return response.data
+  } catch (error) {
+    get(error, 'response.data.errors', []).forEach(error =>
+      logger.log('error', error)
+    )
     throw error
-  })
+  }
 }
 
 function openRequest (url, options) {
