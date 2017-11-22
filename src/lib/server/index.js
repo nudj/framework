@@ -14,10 +14,12 @@ const { merge } = require('@nudj/library')
 
 const logger = require('../lib/logger')
 const getMiddleware = require('./lib/middleware')
-const {
-  isAjax,
-  addAjaxPostfix
-} = require('../lib')
+const { isAjax, addAjaxPostfix } = require('../lib')
+
+process.on('unhandledRejection', error => {
+  // Will print "unhandledRejection err is not defined"
+  console.log('unhandledRejection', error)
+})
 
 module.exports = ({
   App,
@@ -28,19 +30,23 @@ module.exports = ({
   buildAssetPath,
   mockData,
   spoofLoggedIn,
-  errorHandlers
+  errorHandlers,
+  gqlFragments
 }) => {
-  let strategy = new Auth0Strategy({
-    domain: process.env.AUTH0_DOMAIN,
-    clientID: process.env.AUTH0_CLIENT_ID,
-    clientSecret: process.env.AUTH0_CLIENT_SECRET,
-    callbackURL: `${process.env.PROTOCOL_DOMAIN}/callback`
-  }, (accessToken, refreshToken, extraParams, profile, done) => {
-    // accessToken is the token to call Auth0 API (not needed in the most cases)
-    // extraParams.id_token has the JSON Web Token
-    // profile has all the information from the user
-    return done(null, profile)
-  })
+  let strategy = new Auth0Strategy(
+    {
+      domain: process.env.AUTH0_DOMAIN,
+      clientID: process.env.AUTH0_CLIENT_ID,
+      clientSecret: process.env.AUTH0_CLIENT_SECRET,
+      callbackURL: `${process.env.PROTOCOL_DOMAIN}/callback`
+    },
+    (accessToken, refreshToken, extraParams, profile, done) => {
+      // accessToken is the token to call Auth0 API (not needed in the most cases)
+      // extraParams.id_token has the JSON Web Token
+      // profile has all the information from the user
+      return done(null, profile)
+    }
+  )
   passport.use(strategy)
   passport.serializeUser((user, done) => done(null, user))
   passport.deserializeUser((user, done) => done(null, user))
@@ -66,7 +72,8 @@ module.exports = ({
     reduxReducers,
     mockData,
     spoofLoggedIn,
-    errorHandlers
+    errorHandlers,
+    gqlFragments
   }
   const middleware = getMiddleware(middlewareOptions)
   const Redirect = (req, res, next, options) => {
@@ -77,7 +84,11 @@ module.exports = ({
     if (isAjax(req.originalUrl)) {
       redirectUrl = addAjaxPostfix(redirectUrl)
     }
-    logger.log('info', `Redirect - From: ${req.originalUrl}, To: ${redirectUrl}`, ...options.log)
+    logger.log(
+      'info',
+      `Redirect - From: ${req.originalUrl}, To: ${redirectUrl}`,
+      ...options.log
+    )
     res.redirect(303, redirectUrl)
   }
   const NotFound = (req, res, next, options) => {
@@ -114,13 +125,16 @@ module.exports = ({
       }
     }
   }
-  const allErrorHandlers = merge({
-    Redirect,
-    NotFound,
-    Unauthorized,
-    AppError,
-    GenericError
-  }, errorHandlers)
+  const allErrorHandlers = merge(
+    {
+      Redirect,
+      NotFound,
+      Unauthorized,
+      AppError,
+      GenericError
+    },
+    errorHandlers
+  )
 
   if (process.env.REDIS_SESSION === 'true') {
     // add redis persistence to session
@@ -140,10 +154,13 @@ module.exports = ({
 
   app.use(favicon(path.join(__dirname, 'assets/images/nudj-square.ico')))
   app.use(bodyParser.urlencoded({ extended: false }))
-  app.use(bodyParser.json())
+  app.use(bodyParser.json({ limit: '5mb' }))
   app.use('/build', express.static(buildAssetPath, dynamicAssetOptions))
   app.use('/assets', express.static(expressAssetPath, cachedAssetOptions))
-  app.use('/assets', express.static(path.join(__dirname, 'assets'), cachedAssetOptions))
+  app.use(
+    '/assets',
+    express.static(path.join(__dirname, 'assets'), cachedAssetOptions)
+  )
   app.use(session(sessionOpts))
   app.use(passport.initialize())
   app.use(passport.session())
