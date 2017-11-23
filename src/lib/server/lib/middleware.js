@@ -3,7 +3,7 @@ const _ensureLoggedIn = require('connect-ensure-login')
 const getTime = require('date-fns/get_time')
 const { merge } = require('@nudj/library')
 
-const request = require('../../lib/requestGql')
+const request = require('../../lib/requestGQL')
 const app = require('../../redux/server')
 const { removeAjaxPostfix } = require('../../lib')
 const { AJAX_POSTFIX } = require('../../lib/constants')
