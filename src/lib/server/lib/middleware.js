@@ -43,18 +43,20 @@ const getMiddleware = ({
   function respondWith (gqlQueryComposer) {
     return async (req, res, next) => {
       try {
-        // fetch page data based on given gql query
         let pageData = {}
+        // fetch page data based on given gql query
         if (gqlQueryComposer) {
-          const { gql, variables, respond } = await gqlQueryComposer({
+          pageData = await gqlQueryComposer({
+            data: {},
             params: req.params,
             body: req.body,
             files: req.files,
             query: req.query,
             session: req.session
           })
-          pageData = await request(gql, variables)
-          if (respond) return await respond(pageData)
+          if (pageData.gql && pageData.variables) {
+            pageData = await request(pageData.gql, pageData.variables)
+          }
         }
         render(req, res, next, pageData)
       } catch (error) {
