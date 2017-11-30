@@ -57,7 +57,7 @@ const Client = ({
   const ReduxApp = reduxInit({ LoadingComponent })
 
   function fetchData (url, query, hash, dispatch) {
-    return request(addAjaxPostfix(url) + query)
+    return request(addAjaxPostfix(url + query))
       .then((data) => {
         if (data) {
           // only update page state if this is the latest request

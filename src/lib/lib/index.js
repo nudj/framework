@@ -8,6 +8,10 @@ const addAjaxPostfix = (url) => {
   if (url.endsWith('/')) {
     url = url.slice(0, -1)
   }
+  if (url.includes('?')) {
+    url = url.split('?')
+    return `${url[0]}${AJAX_POSTFIX}?${url[1]}`
+  }
   return `${url}${AJAX_POSTFIX}`
 }
 const removeAjaxPostfix = (url) => {

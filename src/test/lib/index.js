@@ -47,6 +47,11 @@ describe('Library functions', () => {
       const url = '/hello/there/'
       expect(addAjaxPostfix(url)).to.equal('/hello/there' + AJAX_POSTFIX)
     })
+
+    it('appends AJAX_POSTFIX to url with query string', () => {
+      const url = '/url/thing?cash=money'
+      expect(addAjaxPostfix(url)).to.equal('/url/thing/json?cash=money')
+    })
   })
 
   describe('removeAjaxPostfix', () => {
@@ -58,6 +63,11 @@ describe('Library functions', () => {
     it('leaves the url unaltered if "/json" is not present', () => {
       const url = '/my-favourite/url'
       expect(removeAjaxPostfix(url)).to.equal(url)
+    })
+
+    it('maintains the query string on the url', () => {
+      const url = '/go/team/json?dogs=thebest'
+      expect(removeAjaxPostfix(url)).to.equal('/go/team?dogs=thebest')
     })
 
     it('returns a base url if no url is passed', () => {
