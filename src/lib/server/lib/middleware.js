@@ -40,22 +40,38 @@ const getMiddleware = ({
   const spoofUser = process.env.SPOOF_USER === 'true'
   const ensureLoggedIn = spoofUser ? spoofLoggedIn : doEnsureLoggedIn
 
-  function respondWith (gqlQueryComposer) {
+  function respondWith (fetcher = () => ({})) {
+    return async (req, res, next) => {
+      try {
+        const pageData = await fetcher({
+          data: {},
+          params: req.params,
+          body: req.body,
+          files: req.files,
+          query: req.query,
+          session: req.session
+        })
+        render(req, res, next, pageData)
+      } catch (error) {
+        console.error(error)
+        next(error)
+      }
+    }
+  }
+
+  function respondWithGql (gqlQueryComposer = () => ({})) {
     return async (req, res, next) => {
       try {
         // fetch page data based on given gql query
-        let pageData = {}
-        if (gqlQueryComposer) {
-          const { gql, variables, respond } = await gqlQueryComposer({
-            params: req.params,
-            body: req.body,
-            files: req.files,
-            query: req.query,
-            session: req.session
-          })
-          pageData = await request(gql, variables)
-          if (respond) return await respond(pageData)
-        }
+        const { gql, variables, respond } = gqlQueryComposer({
+          params: req.params,
+          body: req.body,
+          files: req.files,
+          query: req.query,
+          session: req.session
+        })
+        const pageData = await request(gql, variables)
+        if (respond) return await respond(pageData)
         render(req, res, next, pageData)
       } catch (error) {
         console.error(error)
@@ -131,6 +147,7 @@ const getMiddleware = ({
   return {
     ensureLoggedIn,
     respondWith,
+    respondWithGql,
     render
   }
 }
