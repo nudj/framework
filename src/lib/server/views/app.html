@@ -46,7 +46,15 @@
     var data = <%= data %>
     var renderedClassNames = <%= JSON.stringify(css.renderedClassNames) %>
   </script>
-  <style>* { box-sizing: border-box; }</style>
+  <style>
+    * { box-sizing: border-box; }
+    html,
+    body,
+    #app {
+      width: 100%;
+      height: 100%;
+    }
+  </style>
   <style data-aphrodite><%= css.content %></style>
 </head>
 <body>
