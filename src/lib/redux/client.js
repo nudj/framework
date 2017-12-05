@@ -56,8 +56,8 @@ const Client = ({
   const latestRequest = {}
   const ReduxApp = reduxInit({ LoadingComponent })
 
-  function fetchData (url, hash, dispatch) {
-    return request(addAjaxPostfix(url))
+  function fetchData (url, query, hash, dispatch) {
+    return request(addAjaxPostfix(url + query))
       .then((data) => {
         if (data) {
           // only update page state if this is the latest request
@@ -65,7 +65,7 @@ const Client = ({
             dispatch(setPage(data))
           }
           // if the url inside the data does not match the original request it means a redirect has been followed by the browser so the url needs to be updated to match
-          if (data.app.url.originalUrl !== window.location.pathname) {
+          if (data.app.url.originalUrl !== window.location.pathname + window.location.search) {
             dispatch(replace(data.app.url.originalUrl))
           }
         }
@@ -93,13 +93,14 @@ const Client = ({
     <Provider store={store}>
       <ConnectedRouter history={history} onChange={(dispatch, location, historyAction) => {
         const url = location.pathname
+        const query = location.search
         const hash = location.key
         const state = store.getState()
-        if (url !== state.app.url.originalUrl) {
+        if (url + query !== state.app.url.originalUrl) {
           dispatch(showLoading())
           latestRequest.hash = hash
           latestRequest.url = url
-          return fetchData(url, hash, dispatch)
+          return fetchData(url, query, hash, dispatch)
         }
         return Promise.resolve()
       }}>
