@@ -1,6 +1,6 @@
 {
   "name": "@nudj/framework",
-  "version": "9.0.0",
+  "version": "9.0.3",
   "description": "Nudj framework",
   "main": "lib",
   "repository": {
@@ -23,9 +23,9 @@
     ]
   },
   "dependencies": {
-    "@nudj/api": "4.0.0",
-    "@nudj/components": "0.1.3",
-    "@nudj/library": "2.0.0",
+    "@nudj/api": "4.0.1",
+    "@nudj/components": "1.0.0",
+    "@nudj/library": "2.1.0",
     "@nudj/react-router-redux": "0.2.0--5.0.0-alpha.6",
     "aphrodite": "^1.2.0",
     "axios": "^0.16.1",
