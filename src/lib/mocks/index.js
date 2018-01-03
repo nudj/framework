@@ -1,11 +1,9 @@
-const mock = require('@nudj/api/mock')
+const getMockApiApps = require('@nudj/api/mock')
 const find = require('lodash/find')
 const rewrite = require('express-urlrewrite')
 
-module.exports = ({
-  data
-}) => {
-  const addCustomHandlers = (server) => {
+module.exports = ({ data }) => {
+  const addCustomHandlers = server => {
     server.get('/:type/filter', rewrite('/:type'))
     server.get('/:type/first', (req, res, next) => {
       let type = req.params.type
@@ -23,7 +21,7 @@ module.exports = ({
     return server
   }
 
-  return mock.gql({
+  return getMockApiApps({
     data,
     addCustomHandlers
   })

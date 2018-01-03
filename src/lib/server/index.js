@@ -15,6 +15,7 @@ const { merge } = require('@nudj/library')
 const logger = require('../lib/logger')
 const getMiddleware = require('./lib/middleware')
 const { isAjax, addAjaxPostfix } = require('../lib')
+const getMockApiApps = require('../mocks')
 
 process.on('unhandledRejection', error => {
   // Will print "unhandledRejection err is not defined"
@@ -28,7 +29,6 @@ module.exports = ({
   expressRouters,
   expressAssetPath,
   buildAssetPath,
-  mockData,
   spoofLoggedIn,
   errorHandlers,
   gqlFragments
@@ -70,7 +70,6 @@ module.exports = ({
     App,
     reduxRoutes,
     reduxReducers,
-    mockData,
     spoofLoggedIn,
     errorHandlers,
     gqlFragments
@@ -141,11 +140,6 @@ module.exports = ({
     sessionOpts.store = new RedisStore({
       client: redis.createClient(6379, 'redis')
     })
-  }
-  if (process.env.USE_MOCKS === 'true') {
-    // start mock api
-    let mockApi = require('../mocks')({ data: mockData })
-    mockApi.listen(81, 82, () => logger.log('info', 'Mock APIs running'))
   }
 
   app.engine('html', cons.lodash)
@@ -228,5 +222,8 @@ module.exports = ({
     }
   })
 
-  app.listen(80, () => logger.log('info', 'App running'))
+  return {
+    app,
+    getMockApiApps
+  }
 }
