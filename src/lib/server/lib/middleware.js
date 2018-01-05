@@ -63,7 +63,6 @@ const getMiddleware = ({
     return async (req, res, next) => {
       try {
         // fetch page data based on given gql query
-
         const { gql, variables, respond, transformData } = gqlQueryComposer({
           params: req.params,
           body: req.body,
@@ -71,7 +70,9 @@ const getMiddleware = ({
           query: req.query,
           session: req.session
         })
-        let pageData = await request(gql, variables)
+
+        let pageData = {}
+        if (gql) pageData = await request(gql, variables)
         if (typeof transformData === 'function') {
           pageData = await transformData(pageData)
         }
