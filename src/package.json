@@ -23,8 +23,8 @@
     ]
   },
   "dependencies": {
-    "@nudj/api": "6.1.0",
-    "@nudj/components": "1.0.0",
+    "@nudj/api": "7.0.0",
+    "@nudj/components": "2.0.0",
     "@nudj/library": "4.1.0",
     "@nudj/react-router-redux": "0.2.0--5.0.0-alpha.6",
     "aphrodite": "^1.2.0",
