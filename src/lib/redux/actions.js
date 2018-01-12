@@ -142,17 +142,20 @@ module.exports.hideNotification = () => {
 module.exports.postData = ({
   url,
   method = 'post',
-  data
+  data,
+  params
 }, callback) => {
   return (dispatch, getState) => {
     const state = getState()
     dispatch(hideDialog())
     dispatch(showLoading())
-    request(addAjaxPostfix(url), {
+    request({
+      url: addAjaxPostfix(url),
       method,
-      data: merge(data, {
+      data: data && merge(data, {
         _csrf: state.app.csrfToken
-      })
+      }),
+      params
     })
     .then((data) => {
       const notification = get(data, 'app.notification')
