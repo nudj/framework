@@ -143,13 +143,14 @@ module.exports.postData = ({
   url,
   method = 'post',
   data,
+  showLoading = true,
   params
 }, callback) => {
   return (dispatch, getState) => {
     const state = getState()
     dispatch(hideDialog())
-    dispatch(showLoading())
-    request({
+    if (showLoading) dispatch(showLoading())
+    return request({
       url: addAjaxPostfix(url),
       method,
       data: data && merge(data, {
@@ -164,7 +165,7 @@ module.exports.postData = ({
       }
       dispatch(fetchedPage(data))
       if (data.app.url.originalUrl !== url) {
-        dispatch(push(data.app.url.originalUrl))
+        return dispatch(push(data.app.url.originalUrl))
       } else {
         callback && callback()
       }
