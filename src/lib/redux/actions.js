@@ -143,13 +143,13 @@ module.exports.postData = ({
   url,
   method = 'post',
   data,
-  showLoading = true,
+  showLoadingState = true,
   params
 }, callback) => {
   return (dispatch, getState) => {
     const state = getState()
     dispatch(hideDialog())
-    if (showLoading) dispatch(showLoading())
+    if (showLoadingState) dispatch(showLoading())
     return request({
       url: addAjaxPostfix(url),
       method,
