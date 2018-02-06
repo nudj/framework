@@ -5,14 +5,22 @@ const stripDelims = (tag) => tag.slice(2, -2)
 
 const isAjax = (url) => url.includes('/json')
 const addAjaxPostfix = (url) => {
-  if (url.endsWith('/')) {
-    url = url.slice(0, -1)
+  let newUrl = ''
+  const [pathname, search] = url.split('?')
+
+  if (pathname.endsWith('/')) {
+    newUrl = pathname.slice(0, -1)
+  } else {
+    newUrl = pathname
   }
-  if (url.includes('?')) {
-    url = url.split('?')
-    return `${url[0]}${AJAX_POSTFIX}?${url[1]}`
+
+  newUrl = `${newUrl}${AJAX_POSTFIX}`
+
+  if (search) {
+    newUrl = `${newUrl}?${search}`
   }
-  return `${url}${AJAX_POSTFIX}`
+
+  return newUrl
 }
 const removeAjaxPostfix = (url) => {
   url = isAjax(url) ? url.replace('/json', '') : url
