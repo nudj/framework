@@ -43,9 +43,10 @@ describe('Library functions', () => {
       expect(addAjaxPostfix(url)).to.equal(url + AJAX_POSTFIX)
     })
 
-    it('strips the url of trailing slashes', () => {
-      const url = '/hello/there/'
-      expect(addAjaxPostfix(url)).to.equal('/hello/there' + AJAX_POSTFIX)
+    it('strips the url of additional slashes', () => {
+      expect(addAjaxPostfix('/')).to.equal(AJAX_POSTFIX)
+      expect(addAjaxPostfix('/?cash=money')).to.equal(`${AJAX_POSTFIX}?cash=money`)
+      expect(addAjaxPostfix('/hello/there/')).to.equal('/hello/there' + AJAX_POSTFIX)
     })
 
     it('appends AJAX_POSTFIX to url with query string', () => {

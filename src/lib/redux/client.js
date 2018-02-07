@@ -64,8 +64,17 @@ const Client = ({
           if (hash === latestRequest.hash) {
             dispatch(setPage(data))
           }
+
+          let [originalPathname, originalSearch] = data.app.url.originalUrl.split('?')
+          originalPathname = originalPathname || '/'
+          const newPathname = window.location.pathname
+          const newSearch = window.location.search.split('?')[1]
+
           // if the url inside the data does not match the original request it means a redirect has been followed by the browser so the url needs to be updated to match
-          if (data.app.url.originalUrl !== window.location.pathname + window.location.search) {
+          if (
+            originalPathname !== newPathname ||
+            originalSearch !== newSearch
+          ) {
             dispatch(replace(data.app.url.originalUrl))
           }
         }

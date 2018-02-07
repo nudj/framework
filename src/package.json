@@ -1,6 +1,6 @@
 {
   "name": "@nudj/framework",
-  "version": "13.2.1",
+  "version": "13.3.0",
   "description": "Nudj framework",
   "main": "lib",
   "repository": {
@@ -23,7 +23,7 @@
     ]
   },
   "dependencies": {
-    "@nudj/api": "8.2.1",
+    "@nudj/api": "8.3.0",
     "@nudj/components": "2.0.0",
     "@nudj/library": "4.1.0",
     "@nudj/react-router-redux": "0.2.0--5.0.0-alpha.6",
@@ -31,6 +31,7 @@
     "axios": "^0.16.1",
     "body-parser": "^1.16.1",
     "classnames": "^2.2.5",
+    "cookie-parser": "^1.4.3",
     "connect-ensure-login": "^0.1.1",
     "connect-redis": "^3.2.0",
     "consolidate": "^0.14.5",
