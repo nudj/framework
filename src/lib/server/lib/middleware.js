@@ -73,11 +73,11 @@ const getMiddleware = ({
       })
       try {
         let pageData = {}
-        if (gql) pageData = await request(gql, variables)
+        if (typeof gql === 'string') pageData = await request(gql, variables)
         if (typeof transformData === 'function') {
           pageData = await transformData(pageData)
         }
-        if (respond) return await respond(pageData)
+        if (typeof respond === 'function') return await respond(pageData)
 
         render(req, res, next, pageData)
       } catch (error) {
