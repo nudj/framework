@@ -68,7 +68,9 @@ const getMiddleware = ({
           body: req.body,
           files: req.files,
           query: req.query,
-          session: req.session
+          session: req.session,
+          req,
+          res
         })
 
         let pageData = {}
