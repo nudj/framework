@@ -1,6 +1,7 @@
 const path = require('path')
 const express = require('express')
 const bodyParser = require('body-parser')
+const cookieParser = require('cookie-parser')
 const fileUpload = require('express-fileupload')
 const cons = require('consolidate')
 const session = require('express-session')
@@ -146,6 +147,7 @@ module.exports = ({
   app.set('view engine', 'html')
   app.set('views', path.join(__dirname, 'views'))
 
+  app.use(cookieParser())
   app.use(favicon(path.join(__dirname, 'assets/images/nudj-square.ico')))
   app.use(bodyParser.urlencoded({ extended: false }))
   app.use(bodyParser.json({ limit: '5mb' }))
