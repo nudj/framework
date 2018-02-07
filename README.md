@@ -27,4 +27,4 @@ Nudj universal-express-redux-react app framework
 8. Tag the version using `git tag [x.x.x]`
 9. Push the tag: `git push origin --tags`
 10. Copy the release notes: `git --no-pager log [PREVIOUS_VERSION_TAG]..[NEW_VERSION_TAG] --pretty=format:'- %s %H ' --reverse --no-merges | pbcopy`
-11. Put the release notes on the [relevant release on GitHub](https://github.com/nudj/components/releases)
+11. Put the release notes on the [relevant release on GitHub](https://github.com/nudj/framework/releases)
