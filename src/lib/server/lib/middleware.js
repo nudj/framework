@@ -81,8 +81,17 @@ const getMiddleware = ({
 
         render(req, res, next, pageData)
       } catch (error) {
+        if (error.constructor.name === 'Redirect') return next(error)
         console.error(error)
-        if (typeof catcher === 'function') return catcher(error, next)
+
+        if (typeof catcher === 'function') {
+          try {
+            return catcher(error)
+          } catch (error) {
+            console.error(error)
+            next(error)
+          }
+        }
         next(error)
       }
     }
