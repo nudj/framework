@@ -1,15 +1,15 @@
 const React = require('react')
 const ReactDOMServer = require('react-dom/server')
-const { StaticRouter } = require('react-router-dom')
+const { StaticRouter, Switch } = require('react-router-dom')
 const { Provider } = require('react-redux')
-const { createStore, combineReducers, applyMiddleware } = require('redux')
 const { Helmet } = require('react-helmet')
 const { StyleSheetServer } = require('aphrodite/no-important')
-const thunkMiddleware = require('redux-thunk').default
-const { merge } = require('@nudj/library')
 
-const reduxInit = require('./')
+const getConfigureStore = require('./configure-store')
+const Framework = require('./framework')
 const appReducer = require('./reducer')
+const createReactRoutes = require('./create-react-routes')
+const NotFoundRoute = require('./not-found-route')
 const logger = require('../lib/logger')
 
 logger.log('info', 'Server', 'process.env.NODE_ENV', process.env.NODE_ENV)
@@ -21,14 +21,13 @@ module.exports = ({
   data,
   LoadingComponent
 }) => {
-  const ReduxApp = reduxInit({ LoadingComponent })
-  const store = createStore(
-    combineReducers(merge({
-      app: appReducer
-    }, reduxReducers)),
-    data,
-    applyMiddleware(thunkMiddleware)
-  )
+  const store = getConfigureStore({
+    app: appReducer,
+    ...reduxReducers
+  })(data)
+
+  const routes = createReactRoutes(reduxRoutes)
+
   const context = {}
   const { html, css } = StyleSheetServer.renderStatic(() => {
     return ReactDOMServer.renderToString(
@@ -37,7 +36,14 @@ module.exports = ({
           location={data.app.url.originalUrl}
           context={context}
         >
-          <ReduxApp {...data.app} App={App} routes={reduxRoutes} />
+          <App {...data.app}>
+            <Framework Loader={LoadingComponent}>
+              <Switch>
+                {routes}
+                <NotFoundRoute />
+              </Switch>
+            </Framework>
+          </App>
         </StaticRouter>
       </Provider>
     )
