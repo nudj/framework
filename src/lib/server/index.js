@@ -151,7 +151,11 @@ module.exports = ({
   app.use(favicon(path.join(__dirname, 'assets/images/nudj-square.ico')))
   app.use(bodyParser.urlencoded({ extended: false }))
   app.use(bodyParser.json({ limit: '5mb' }))
-  app.use('/build', express.static(buildAssetPath, dynamicAssetOptions))
+
+  if (buildAssetPath) {
+    app.use('/build', express.static(buildAssetPath, dynamicAssetOptions))
+  }
+
   app.use('/assets', express.static(expressAssetPath, cachedAssetOptions))
   app.use(
     '/assets',
