@@ -12,44 +12,13 @@ const getOnRouterChange = require('./on-router-change')
 const getConfigureStore = require('./configure-store')
 const Framework = require('./framework')
 const NotFoundRoute = require('./not-found-route')
-const createReactRoutes = require('./create-react-routes')
 
-const Client = ({
-  App,
-  reduxRoutes,
-  reduxReducers,
-  LoadingComponent
-}) => {
-  const history = createBrowserHistory()
-
-  /**
-   * Moving `getConfigureStore` to hire will allow for hot reloading of
-   * reducers and actions.
-   *
-   * Alternatively, we could expose the store AND render method to hire so
-   * it can use `replaceReducer` as below
-   */
-  const store = getConfigureStore({
-    router: routerReducer,
-    app: appReducer,
-    ...reduxReducers
-  }, history)(data)
-
-  /**
-   * Although I'm not 100% sure how to pass the store down to `handleRouterChange`...
-   * it may work fine as is, given `store` stays the same, and we use `store.replaceReducer`
-   * to enable hot reloading
-   */
-  const handleRouterChange = getOnRouterChange(store)
-
-  const routes = createReactRoutes(reduxRoutes)
-
-  StyleSheet.rehydrate(renderedClassNames)
+const getRenderApp = (store, handleRouterChange, history) => (App, routes, loader) => {
   render(
     <Provider store={store}>
       <ConnectedRouter history={history} onChange={handleRouterChange}>
         <App {...data.app} history={history}>
-          <Framework Loader={LoadingComponent}>
+          <Framework Loader={loader}>
             <Switch>
               {routes}
               <NotFoundRoute />
@@ -62,4 +31,22 @@ const Client = ({
   )
 }
 
-module.exports = Client
+const initialiseClient = (reducers) => {
+  const history = createBrowserHistory()
+
+  const store = getConfigureStore({
+    router: routerReducer,
+    app: appReducer,
+    ...reducers
+  }, history)(data)
+
+  const handleRouterChange = getOnRouterChange(store)
+  StyleSheet.rehydrate(renderedClassNames)
+
+  return {
+    store,
+    render: getRenderApp(store, handleRouterChange, history)
+  }
+}
+
+module.exports = initialiseClient
