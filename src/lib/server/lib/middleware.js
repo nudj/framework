@@ -81,8 +81,17 @@ const getMiddleware = ({
 
         render(req, res, next, pageData)
       } catch (error) {
+        if (error.constructor.name === 'Redirect') return next(error)
         console.error(error)
-        if (typeof catcher === 'function') return catcher(error, next)
+
+        if (typeof catcher === 'function') {
+          try {
+            return catcher(error)
+          } catch (error) {
+            console.error(error)
+            next(error)
+          }
+        }
         next(error)
       }
     }
@@ -147,7 +156,9 @@ const getMiddleware = ({
           person.lastName &&
           `'${person.firstName} ${person.lastName}'`,
         email: person && `'${person.email}'`,
-        created_at: person && getTime(person.created) / 1000
+        created_at: person && getTime(person.created) / 1000,
+        env: process.env.NODE_ENV,
+        build_asset_path: process.env.USE_DEV_SERVER ? 'https://localhost:83' : ''
       })
     }
   }
