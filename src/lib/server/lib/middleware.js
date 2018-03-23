@@ -158,7 +158,7 @@ const getMiddleware = ({
         email: person && `'${person.email}'`,
         created_at: person && getTime(person.created) / 1000,
         env: process.env.NODE_ENV,
-        build_asset_path: process.env.USE_DEV_SERVER ? 'https://localhost:83' : ''
+        build_asset_path: process.env.USE_DEV_SERVER ? `${process.env.DEV_SERVER_PATH}` : ''
       })
     }
   }
