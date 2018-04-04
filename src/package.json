@@ -1,6 +1,6 @@
 {
   "name": "@nudj/framework",
-  "version": "15.0.0",
+  "version": "16.0.0",
   "description": "Nudj framework",
   "main": "lib",
   "repository": {
@@ -23,7 +23,7 @@
     ]
   },
   "dependencies": {
-    "@nudj/api": "10.0.0",
+    "@nudj/api": "14.0.0",
     "@nudj/components": "2.0.0",
     "@nudj/library": "4.1.0",
     "@nudj/react-router-redux": "0.2.0--5.0.0-alpha.6",
