@@ -13,7 +13,6 @@ Nudj universal-express-redux-react app framework
 - `reduxReducers`: redux reducers for page level interactions
 - `expressRouters`: array of routers to add to the express app
 - `expressAssetPath`: path to dynamically built files express needs to statically serve
-- `mockData`: data object to use in mock api (in json-server format)
 
 
 ## Examples
@@ -46,17 +45,6 @@ const path = require('path')
 const expressAssetPath = path.join(__dirname, 'server/assets')
 ```
 
-`mockData`
-```
-const mockData = {
-  people: [
-    {
-      id: 1,
-      name: 'Test person'
-    }
-  ]
-}
-```
 
 ## Usage
 
@@ -81,6 +69,5 @@ const mockData = {
     reduxReducers,
     expressRouters,
     expressAssetPath,
-    mockData
   })
   ```
