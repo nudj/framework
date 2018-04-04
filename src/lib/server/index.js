@@ -16,7 +16,6 @@ const { merge } = require('@nudj/library')
 const logger = require('../lib/logger')
 const getMiddleware = require('./lib/middleware')
 const { isAjax, addAjaxPostfix } = require('../lib')
-const getMockApiApps = require('../mocks')
 
 process.on('unhandledRejection', error => {
   // Will print "unhandledRejection err is not defined"
@@ -228,8 +227,5 @@ module.exports = ({
     }
   })
 
-  return {
-    app,
-    getMockApiApps
-  }
+  return app
 }
