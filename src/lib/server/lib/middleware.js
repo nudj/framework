@@ -12,7 +12,6 @@ const getMiddleware = ({
   App,
   reduxRoutes,
   reduxReducers,
-  mockData,
   spoofLoggedIn,
   errorHandlers,
   gqlFragments
