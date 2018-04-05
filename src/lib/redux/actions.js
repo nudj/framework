@@ -166,10 +166,11 @@ module.exports.postData = ({
       dispatch(fetchedPage(data))
 
       const currentUrl = `${window.location.pathname}${window.location.search}`
-      const requestedUrl = url
-      const resolvedUrl = data.app.url.path
+      const requestedPath = url
+      const resolvedUrl = data.app.url.originalUrl
+      const resolvedPath = data.app.url.path
 
-      if (resolvedUrl !== requestedUrl) {
+      if (resolvedPath !== requestedPath) {
         return dispatch(push(resolvedUrl))
       } else if (resolvedUrl !== currentUrl) {
         return dispatch(replace(resolvedUrl))
