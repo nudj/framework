@@ -102,7 +102,9 @@ const getMiddleware = ({
       url: {
         protocol: req.protocol,
         hostname: req.hostname,
-        originalUrl: removeAjaxPostfix(req.originalUrl)
+        originalUrl: removeAjaxPostfix(req.originalUrl),
+        path: removeAjaxPostfix(req.path),
+        query: req.query
       },
       web: {
         protocol: req.protocol,
