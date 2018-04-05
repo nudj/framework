@@ -1,4 +1,4 @@
-const { push } = require('@nudj/react-router-redux')
+const { push, replace } = require('@nudj/react-router-redux')
 const get = require('lodash/get')
 const { merge } = require('@nudj/library')
 
@@ -164,8 +164,15 @@ module.exports.postData = ({
         data.app.notification.timer = setTimeout(() => dispatch(hideNotification()), 5000)
       }
       dispatch(fetchedPage(data))
-      if (data.app.url.originalUrl !== url) {
-        return dispatch(push(data.app.url.originalUrl))
+
+      const currentUrl = `${window.location.pathname}${window.location.search}`
+      const requestedUrl = url
+      const resolvedUrl = data.app.url.path
+
+      if (resolvedUrl !== requestedUrl) {
+        return dispatch(push(resolvedUrl))
+      } else if (resolvedUrl !== currentUrl) {
+        return dispatch(replace(resolvedUrl))
       } else {
         callback && callback()
       }
