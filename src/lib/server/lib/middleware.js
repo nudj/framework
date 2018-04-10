@@ -1,6 +1,7 @@
 const get = require('lodash/get')
 const _ensureLoggedIn = require('connect-ensure-login')
 const getTime = require('date-fns/get_time')
+const encodeHMACSHA256 = require('crypto-js/hmac-sha256')
 const { merge } = require('@nudj/library')
 
 const request = require('../../lib/requestGQL')
@@ -56,6 +57,23 @@ const getMiddleware = ({
         next(error)
       }
     }
+  }
+
+  async function fetchPerson (userId) {
+    if (!userId) return null
+
+    const gql = `
+      query fetchPerson ($userId: ID!) {
+        person(id: $userId) {
+          email
+          firstName
+          lastName
+        }
+      }
+    `
+
+    const { person } = await request(gql, { userId })
+    return person
   }
 
   function respondWithGql (gqlQueryComposer = () => ({})) {
@@ -118,7 +136,7 @@ const getMiddleware = ({
     respond(req, res, next, renderData)
   }
 
-  function respond (req, res, next, renderData) {
+  async function respond (req, res, next, renderData) {
     delete req.session.logout
     delete req.session.returnTo
 
@@ -139,24 +157,33 @@ const getMiddleware = ({
     if (staticContext.url) {
       res.redirect(staticContext.url)
     } else {
+      const person = await fetchPerson(req.session.userId)
       let status = get(
         renderData,
         'app.error.code',
         staticContext.status || 200
       )
-      let person = get(renderData, 'app.person')
+      let intercomUserToken = null
+      let email = null
+
+      if (person && person.email) {
+        intercomUserToken = encodeHMACSHA256(person.email, process.env.INTERCOM_SECRET_KEY)
+        email = person.email
+      }
+
       res.status(status).render('app', {
         data: JSON.stringify(renderData),
         css: staticContext.css,
         html: staticContext.html,
         helmet: staticContext.helmet,
         intercom_app_id: `'${process.env.INTERCOM_APP_ID}'`,
+        intercom_user_token: intercomUserToken ? `'${intercomUserToken}'` : `${intercomUserToken}`,
+        email: email ? `'${email}'` : `${email}`,
         fullname:
           person &&
           person.firstName &&
           person.lastName &&
           `'${person.firstName} ${person.lastName}'`,
-        email: person && `'${person.email}'`,
         created_at: person && getTime(person.created) / 1000,
         env: process.env.NODE_ENV,
         build_asset_path: process.env.USE_DEV_SERVER ? `${process.env.DEV_SERVER_PATH}` : ''

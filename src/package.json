@@ -1,6 +1,6 @@
 {
   "name": "@nudj/framework",
-  "version": "16.0.3",
+  "version": "16.1.0",
   "description": "Nudj framework",
   "main": "lib",
   "repository": {
@@ -31,10 +31,11 @@
     "axios": "^0.16.1",
     "body-parser": "^1.16.1",
     "classnames": "^2.2.5",
-    "cookie-parser": "^1.4.3",
     "connect-ensure-login": "^0.1.1",
     "connect-redis": "^3.2.0",
     "consolidate": "^0.14.5",
+    "cookie-parser": "^1.4.3",
+    "crypto-js": "^3.1.9-1",
     "csurf": "^1.9.0",
     "date-fns": "^1.28.3",
     "express": "^4.14.1",

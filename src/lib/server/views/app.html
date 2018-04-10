@@ -17,6 +17,8 @@
     }
     var intercomSettings = {
       app_id: <%= intercom_app_id %>,
+      email: <%= email %>,
+      user_hash: <%= intercom_user_token %>,
       custom_launcher_selector: "#open-intercom"
     }
     <% if (fullname) { %>
