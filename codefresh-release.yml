@@ -1,0 +1,22 @@
+version: '1.0'
+
+steps:
+
+  build:
+    title: Build Image
+    type: build
+    image_name: nudj/framework
+    working_directory: ${{main_clone}}
+    dockerfile: Dockerfile
+    build_arguments:
+      - NPM_TOKEN=${{NPM_TOKEN}}
+
+  publish:
+    title: Publish package to npm
+    image: ${{build}}
+    working_directory: 'IMAGE_WORK_DIR'
+    environment:
+      - NPM_TOKEN=${{NPM_TOKEN}}
+    commands:
+      - npm --no-git-tag-version version ${{CF_BRANCH}}
+      - npm publish
