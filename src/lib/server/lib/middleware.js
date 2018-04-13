@@ -176,7 +176,7 @@ const getMiddleware = ({
         css: staticContext.css,
         html: staticContext.html,
         helmet: staticContext.helmet,
-        intercom_app_id: `'${process.env.INTERCOM_APP_ID}'`,
+        intercom_app_id: process.env.INTERCOM_APP_ID,
         intercom_user_token: intercomUserToken ? `'${intercomUserToken}'` : `${intercomUserToken}`,
         email: email ? `'${email}'` : `${email}`,
         fullname:
