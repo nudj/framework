@@ -59,12 +59,12 @@ const getMiddleware = ({
     }
   }
 
-  async function fetchPerson (userId) {
+  async function fetchUser (userId) {
     if (!userId) return null
 
     const gql = `
-      query fetchPerson ($userId: ID!) {
-        person(id: $userId) {
+      query fetchUser {
+        user {
           email
           firstName
           lastName
@@ -72,8 +72,8 @@ const getMiddleware = ({
       }
     `
 
-    const { person } = await request(gql, { userId })
-    return person
+    const { user } = await request(userId, gql)
+    return user
   }
 
   function respondWithGql (gqlQueryComposer = () => ({})) {
@@ -90,7 +90,7 @@ const getMiddleware = ({
       })
       try {
         let pageData = {}
-        if (typeof gql === 'string') pageData = await request(gql, variables)
+        if (typeof gql === 'string') pageData = await request(req.session.userId, gql, variables)
         if (typeof transformData === 'function') {
           pageData = await transformData(pageData)
         }
@@ -157,7 +157,7 @@ const getMiddleware = ({
     if (staticContext.url) {
       res.redirect(staticContext.url)
     } else {
-      const person = await fetchPerson(req.session.userId)
+      const user = await fetchUser(req.session.userId)
       let status = get(
         renderData,
         'app.error.code',
@@ -166,9 +166,9 @@ const getMiddleware = ({
       let intercomUserToken = null
       let email = null
 
-      if (person && person.email) {
-        intercomUserToken = encodeHMACSHA256(person.email, process.env.INTERCOM_SECRET_KEY)
-        email = person.email
+      if (user && user.email) {
+        intercomUserToken = encodeHMACSHA256(user.email, process.env.INTERCOM_SECRET_KEY)
+        email = user.email
       }
 
       res.status(status).render('app', {
@@ -180,11 +180,11 @@ const getMiddleware = ({
         intercom_user_token: intercomUserToken ? `'${intercomUserToken}'` : `${intercomUserToken}`,
         email: email ? `'${email}'` : `${email}`,
         fullname:
-          person &&
-          person.firstName &&
-          person.lastName &&
-          `'${person.firstName} ${person.lastName}'`,
-        created_at: person && getTime(person.created) / 1000,
+          user &&
+          user.firstName &&
+          user.lastName &&
+          `'${user.firstName} ${user.lastName}'`,
+        created_at: user && getTime(user.created) / 1000,
         env: process.env.NODE_ENV,
         build_asset_path: process.env.USE_DEV_SERVER ? `${process.env.DEV_SERVER_PATH}` : ''
       })

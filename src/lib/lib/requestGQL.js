@@ -2,11 +2,12 @@ const libRequest = require('@nudj/library/request')
 const get = require('lodash/get')
 const logger = require('./logger')
 
-async function request (query, variables) {
+async function request (userId, query, variables) {
   try {
     const response = await libRequest(`http://${process.env.API_HOST}:82/`, {
       method: 'post',
       data: {
+        userId,
         query,
         variables
       }
