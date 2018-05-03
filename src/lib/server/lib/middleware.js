@@ -167,6 +167,7 @@ const getMiddleware = ({
       let email = null
 
       if (user && user.email) {
+        // Similar to intercom.createUser (creates a user if they do not exist)
         intercomUserToken = encodeHMACSHA256(user.email, process.env.INTERCOM_SECRET_KEY)
         email = user.email
       }
