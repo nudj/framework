@@ -11,6 +11,7 @@ const Auth0Strategy = require('passport-auth0')
 const csrf = require('csurf')
 const redis = require('redis')
 const RedisStore = require('connect-redis')(session)
+const helmet = require('helmet')
 const { merge, cookies } = require('@nudj/library')
 
 const logger = require('../lib/logger')
@@ -31,7 +32,8 @@ module.exports = ({
   buildAssetPath,
   spoofLoggedIn,
   errorHandlers,
-  gqlFragments
+  gqlFragments,
+  helmetConfig
 }) => {
   let strategy = new Auth0Strategy(
     {
@@ -52,7 +54,6 @@ module.exports = ({
   passport.deserializeUser((user, done) => done(null, user))
 
   const app = express()
-  app.set('trust proxy', 1)
   const sessionOpts = {
     secret: process.env.SESSION_SECRET,
     name: cookies.getSecureName('session'),
@@ -150,9 +151,20 @@ module.exports = ({
   }
 
   app.engine('html', cons.lodash)
+  app.set('trust proxy', 1)
   app.set('view engine', 'html')
   app.set('views', path.join(__dirname, 'views'))
 
+  app.use(helmet(merge({
+    contentSecurityPolicy: {
+      directives: {
+        defaultSrc: [
+          "'self'"
+        ]
+      }
+    },
+    noCache: true
+  }, helmetConfig || {})))
   app.use(cookieParser())
   app.use(favicon(path.join(__dirname, 'assets/images/nudj-square.ico')))
   app.use(bodyParser.urlencoded({ extended: false }))
