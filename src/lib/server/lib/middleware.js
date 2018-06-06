@@ -3,6 +3,7 @@ const _ensureLoggedIn = require('connect-ensure-login')
 const getTime = require('date-fns/get_time')
 const encodeHMACSHA256 = require('crypto-js/hmac-sha256')
 const { merge } = require('@nudj/library')
+const serialize = require('serialize-javascript')
 
 const request = require('../../lib/requestGQL')
 const app = require('../../redux/server')
@@ -173,8 +174,9 @@ const getMiddleware = ({
       }
 
       res.status(status).render('app', {
-        data: JSON.stringify(renderData),
-        css: staticContext.css,
+        data: serialize(renderData, { isJSON: true }),
+        renderedClassNames: serialize(staticContext.css.renderedClassNames, { isJSON: true }),
+        cssContent: staticContext.css.content,
         html: staticContext.html,
         helmet: staticContext.helmet,
         intercom_app_id: process.env.INTERCOM_APP_ID,
