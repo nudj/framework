@@ -25,7 +25,7 @@
   "dependencies": {
     "@nudj/api": "14.0.0",
     "@nudj/components": "2.0.0",
-    "@nudj/library": "4.1.0",
+    "@nudj/library": "6.3.0",
     "@nudj/react-router-redux": "0.2.0--5.0.0-alpha.6",
     "aphrodite": "^1.2.0",
     "axios": "^0.16.1",

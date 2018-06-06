@@ -11,7 +11,7 @@ const Auth0Strategy = require('passport-auth0')
 const csrf = require('csurf')
 const redis = require('redis')
 const RedisStore = require('connect-redis')(session)
-const { merge } = require('@nudj/library')
+const { merge, cookies } = require('@nudj/library')
 
 const logger = require('../lib/logger')
 const getMiddleware = require('./lib/middleware')
@@ -52,10 +52,17 @@ module.exports = ({
   passport.deserializeUser((user, done) => done(null, user))
 
   const app = express()
+  app.set('trust proxy', 1)
   const sessionOpts = {
     secret: process.env.SESSION_SECRET,
-    resave: true,
-    saveUninitialized: true
+    name: cookies.getSecureName('session'),
+    resave: false, // should not need this as redis store implements touch
+    saveUninitialized: false, // as we dont want to track users (anon or otherwise) unless they login
+    cookie: {
+      secure: true, // true to only allow over HTTPS
+      httpOnly: true, // true so we do not expose to client side JS
+      sameSite: false // false as login flow breaks on web otherwise
+    }
   }
   const dynamicAssetOptions = {
     index: false
