@@ -166,11 +166,16 @@ const getMiddleware = ({
       )
       let intercomUserToken = null
       let email = null
+      let fullname = null
 
       if (user && user.email) {
         // Similar to intercom.createUser (creates a user if they do not exist)
         intercomUserToken = encodeHMACSHA256(user.email, process.env.INTERCOM_SECRET_KEY)
         email = user.email
+      }
+
+      if (user && user.firstName && user.lastName) {
+        fullname = `${user.firstName} ${user.lastName}`
       }
 
       res.status(status).render('app', {
@@ -179,15 +184,14 @@ const getMiddleware = ({
         cssContent: staticContext.css.content,
         html: staticContext.html,
         helmet: staticContext.helmet,
-        intercom_app_id: process.env.INTERCOM_APP_ID,
-        intercom_user_token: intercomUserToken ? `'${intercomUserToken}'` : `${intercomUserToken}`,
-        email: email ? `'${email}'` : `${email}`,
-        fullname:
-          user &&
-          user.firstName &&
-          user.lastName &&
-          `'${user.firstName} ${user.lastName}'`,
-        created_at: user && getTime(user.created) / 1000,
+        cookiesAccepted: req.cookies.cookiesEnabled === 'true',
+        intercom_data: serialize({
+          app_id: process.env.INTERCOM_APP_ID,
+          user_token: intercomUserToken && `${intercomUserToken}`,
+          email: email,
+          fullname,
+          created_at: user && user.created ? getTime(user.created) / 1000 : null
+        }, { isJSON: true }),
         env: process.env.NODE_ENV,
         build_asset_path: process.env.USE_DEV_SERVER ? `${process.env.DEV_SERVER_PATH}` : ''
       })

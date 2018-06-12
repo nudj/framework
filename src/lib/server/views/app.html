@@ -9,42 +9,14 @@
   <link rel='stylesheet' href='/assets/css/reset.css' />
   <%= helmet.link.toString() %>
   <script>
-    // mimic modernizr behaviour for script
+  (function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':new Date().getTime(),event:'gtm.js',intercom_data:<%= intercom_data %>, cookiesAccepted: <%= cookiesAccepted %>});var f=d.getElementsByTagName(s)[0],j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src='https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);})(window,document,'script','dataLayer','GTM-WT43QJJ');
+    var data = <%= data %>
+    var renderedClassNames = <%= JSON.stringify(renderedClassNames) %>
     var html = document.querySelector('html')
     if (html.classList) {
       html.classList.remove('nojs')
       html.classList.add('js')
     }
-    var intercomSettings = {
-      app_id: '<%= intercom_app_id %>',
-      email: <%= email %>,
-      user_hash: <%= intercom_user_token %>,
-      custom_launcher_selector: "#open-intercom"
-    }
-    <% if (fullname) { %>
-    intercomSettings.name = <%= fullname %>
-    <% } %>
-    <% if (!fullname && email) { %>
-    intercomSettings.name = <%= email %>
-    <% } %>
-    <% if (email) { %>
-    intercomSettings.email = <%= email %>
-    <% } %>
-    <% if (created_at) { %>
-    intercomSettings.created_at = <%= created_at %>
-    <% } %>
-    var data = <%= data %>
-    var renderedClassNames = <%= renderedClassNames %>
-  </script>
-  <script>
-    (function(){var b=window,a=b.Intercom;if("function"===typeof a)a("reattach_activator"),a("update",intercomSettings);else{var a=document,c=function(){c.c(arguments)};c.q=[];c.c=function(a){c.q.push(a)};b.Intercom=c;b=a.createElement("script");b.type="text/javascript";b.async=!0;b.src="https://widget.intercom.io/widget/<%= intercom_app_id %>";a=a.getElementsByTagName("script")[0];a.parentNode.insertBefore(b,a)}})()
-  </script>
-  <script>
-    (function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
-    new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
-    j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
-    'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
-    })(window,document,'script','dataLayer','GTM-WT43QJJ');
   </script>
   <style>
     @font-face{font-family:jan;font-style:normal;font-weight:700;src:url('/assets/fonts/F37Jan-Bold.eot?#iefix') format('embedded-opentype'),
