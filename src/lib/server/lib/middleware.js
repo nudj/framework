@@ -2,7 +2,7 @@ const get = require('lodash/get')
 const _ensureLoggedIn = require('connect-ensure-login')
 const getTime = require('date-fns/get_time')
 const encodeHMACSHA256 = require('crypto-js/hmac-sha256')
-const { merge } = require('@nudj/library')
+const { merge, toQs } = require('@nudj/library')
 const serialize = require('serialize-javascript')
 
 const request = require('../../lib/requestGQL')
@@ -29,7 +29,10 @@ const getMiddleware = ({
           return res.status(401).send()
         }
       }
-      _ensureLoggedIn.ensureLoggedIn({ setReturnTo: !req.session.returnTo })(
+      _ensureLoggedIn.ensureLoggedIn({
+        setReturnTo: !req.session.returnTo,
+        redirectTo: `/login?${toQs(req.query)}`
+      })(
         req,
         res,
         next
