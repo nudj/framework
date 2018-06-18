@@ -187,7 +187,7 @@ const getMiddleware = ({
         cssContent: staticContext.css.content,
         html: staticContext.html,
         helmet: staticContext.helmet,
-        cookiesAccepted: req.cookies.cookiesEnabled === 'true',
+        cookiesAccepted: req.cookies.cookiesEnabled !== 'false',
         intercom_data: serialize({
           app_id: process.env.INTERCOM_APP_ID,
           user_token: intercomUserToken && `${intercomUserToken}`,
