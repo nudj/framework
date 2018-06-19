@@ -163,7 +163,6 @@ module.exports.postData = ({
       if (notification) {
         data.app.notification.timer = setTimeout(() => dispatch(hideNotification()), 5000)
       }
-      dispatch(fetchedPage(data))
 
       const currentUrl = `${window.location.pathname}${window.location.search}`
       const requestedPath = url
@@ -171,14 +170,17 @@ module.exports.postData = ({
       const resolvedPath = data.app.url.path
 
       if (resolvedPath !== requestedPath) {
-        return dispatch(push(resolvedUrl))
+        dispatch(push(resolvedUrl))
       } else if (resolvedUrl !== currentUrl) {
-        return dispatch(replace(resolvedUrl))
+        dispatch(replace(resolvedUrl))
       } else {
         callback && callback()
       }
+
+      return dispatch(fetchedPage(data))
     })
     .catch((error) => {
+      if (process.env.NODE_ENV !== 'production') console.error(error)
       const authorities = {
         nudj: '',
         Google: '/auth/google'
