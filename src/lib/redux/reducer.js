@@ -23,7 +23,8 @@ function appReducer (state = initialState, action) {
     case FETCHED_PAGE:
       return merge(action.data.app, {
         sending: false,
-        loading: false
+        loading: false,
+        notification: action.data.app.notification || state.notification
       })
     case SHOW_DIALOG:
       return merge(state, { overlay: action.dialog })

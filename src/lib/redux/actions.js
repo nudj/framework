@@ -90,13 +90,25 @@ function showNotification (notification) {
     notification
   }
 }
-module.exports.showNotification = (notification) => {
+module.exports.showNotification = (nextNotification) => {
   return (dispatch, getState) => {
-    const state = getState()
-    if (!get(state, 'notification.timer')) {
-      notification.timer = setTimeout(() => dispatch(hideNotification()), 5000)
-      dispatch(showNotification(notification))
+    const {
+      app: {
+        notification: currentNotification
+      }
+    } = getState()
+
+    if (currentNotification) {
+      dispatch(hideNotification())
+      clearTimeout(currentNotification.timer)
     }
+
+    dispatch(showNotification({
+      ...nextNotification,
+      timer: nextNotification.timer || setTimeout(() => {
+        dispatch(hideNotification())
+      }, 5000)
+    }))
   }
 }
 
