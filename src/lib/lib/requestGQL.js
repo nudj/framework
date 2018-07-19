@@ -14,9 +14,14 @@ async function request (userId, query, variables) {
     })
     if (response.errors) {
       response.errors.forEach(error =>
-        logger.log('error', error.message, query, variables)
+        logger.log('error', error.id || 'ERROR', error.message, query, variables)
       )
-      throw new Error(response.errors[0].message)
+      const gqlError = response.errors[0]
+      const error = new Error(gqlError.message)
+      Object.keys(gqlError).forEach(key => {
+        error[key] = gqlError[key]
+      })
+      throw error
     }
     return response.data
   } catch (error) {
