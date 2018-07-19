@@ -2,6 +2,14 @@ const libRequest = require('@nudj/library/request')
 const get = require('lodash/get')
 const logger = require('./logger')
 
+function createErrorFromObject (errorObject) {
+  const error = new Error(errorObject.message)
+  Object.keys(errorObject).forEach(key => {
+    error[key] = errorObject[key]
+  })
+  return error
+}
+
 async function request (userId, query, variables) {
   try {
     const response = await libRequest(`http://${process.env.API_HOST}:82/`, {
@@ -13,15 +21,14 @@ async function request (userId, query, variables) {
       }
     })
     if (response.errors) {
+      logger.log('error', query, variables)
       response.errors.forEach(error =>
-        logger.log('error', error.id || 'ERROR', error.message, query, variables)
+        logger.log('error', error.id || 'ERROR', error.message)
       )
-      const gqlError = response.errors[0]
-      const error = new Error(gqlError.message)
-      Object.keys(gqlError).forEach(key => {
-        error[key] = gqlError[key]
-      })
-      throw error
+
+      // The errors in the array will be of the same type and thus
+      // only one needs to be returned to the app.
+      throw createErrorFromObject(response.errors[0])
     }
     return response.data
   } catch (error) {
