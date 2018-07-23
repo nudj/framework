@@ -92,8 +92,8 @@ const getMiddleware = ({
         req,
         res
       })
+      let pageData = {}
       try {
-        let pageData = {}
         if (typeof gql === 'string') pageData = await request(req.session.userId, gql, variables)
         if (typeof transformData === 'function') {
           pageData = await transformData(pageData)
@@ -107,7 +107,8 @@ const getMiddleware = ({
 
         if (typeof catcher === 'function') {
           try {
-            return catcher(error)
+            pageData = await catcher(error)
+            return render(req, res, next, pageData)
           } catch (error) {
             console.error(error)
             next(error)
