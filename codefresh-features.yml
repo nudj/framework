@@ -11,7 +11,17 @@ steps:
     build_arguments:
       - NPM_TOKEN=${{NPM_TOKEN}}
 
-  test:
-    title: Run tests
+  # test:
+  #   title: Run tests
+  #   image: ${{build}}
+  #   working_directory: 'IMAGE_WORK_DIR'
+
+  publish:
+    title: Publish package to npm
     image: ${{build}}
     working_directory: 'IMAGE_WORK_DIR'
+    environment:
+      - NPM_TOKEN=${{NPM_TOKEN}}
+    commands:
+      - npm --no-git-tag-version version debug
+      - npm publish
