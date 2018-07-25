@@ -16,6 +16,7 @@ const { merge, cookies } = require('@nudj/library')
 
 const logger = require('../lib/logger')
 const getMiddleware = require('./lib/middleware')
+const clickLogger = require('./lib/click-logger')
 const { isAjax, addAjaxPostfix } = require('../lib')
 
 process.on('unhandledRejection', error => {
@@ -199,6 +200,7 @@ module.exports = ({
     }
     next()
   })
+  app.use(clickLogger)
 
   // add secure expressRouters
   expressRouters.secure.forEach(router => {
