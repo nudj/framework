@@ -111,7 +111,7 @@ const getMiddleware = ({
             return render(req, res, next, pageData)
           } catch (error) {
             console.error(error)
-            next(error)
+            return next(error)
           }
         }
         next(error)
