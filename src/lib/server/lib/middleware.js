@@ -103,14 +103,14 @@ const getMiddleware = ({
         render(req, res, next, pageData)
       } catch (error) {
         if (error.constructor.name === 'Redirect') return next(error)
-        console.error(error)
+        console.error('respondWithGql', error)
 
         if (typeof catcher === 'function') {
           try {
             pageData = await catcher(error)
             return render(req, res, next, pageData)
           } catch (error) {
-            console.error(error)
+            console.error('catcher', error)
             return next(error)
           }
         }
