@@ -5,7 +5,7 @@ const encodeHMACSHA256 = require('crypto-js/hmac-sha256')
 const { merge, toQs } = require('@nudj/library')
 const serialize = require('serialize-javascript')
 
-const request = require('../../lib/requestGQL')
+const requestGQL = require('../../lib/requestGQL')
 const app = require('../../redux/server')
 const { removeAjaxPostfix } = require('../../lib')
 const { AJAX_POSTFIX } = require('../../lib/constants')
@@ -76,25 +76,27 @@ const getMiddleware = ({
       }
     `
 
-    const { user } = await request(userId, gql)
+    const { user } = await requestGQL(userId, gql)
     return user
   }
 
   function respondWithGql (gqlQueryComposer = () => ({})) {
     return async (req, res, next) => {
+      const requestGQLWithUser = ({ gql, variables }) => requestGQL(req.session.userId, gql, variables)
       // fetch page data based on given gql query
-      const { gql, variables, respond, transformData, catcher } = gqlQueryComposer({
+      const { gql, variables, respond, transformData, catcher } = await gqlQueryComposer({
         params: req.params,
         body: req.body,
         files: req.files,
         query: req.query,
         session: req.session,
+        requestGQL: requestGQLWithUser,
         req,
         res
       })
       let pageData = {}
       try {
-        if (typeof gql === 'string') pageData = await request(req.session.userId, gql, variables)
+        if (typeof gql === 'string') pageData = await requestGQLWithUser({ gql, variables })
         if (typeof transformData === 'function') {
           pageData = await transformData(pageData)
         }
