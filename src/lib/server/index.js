@@ -26,6 +26,7 @@ process.on('unhandledRejection', error => {
 
 module.exports = ({
   App,
+  getAnalytics,
   reduxRoutes,
   reduxReducers,
   expressRouters,
@@ -77,6 +78,7 @@ module.exports = ({
   }
   const middlewareOptions = {
     App,
+    getAnalytics,
     reduxRoutes,
     reduxReducers,
     spoofLoggedIn,

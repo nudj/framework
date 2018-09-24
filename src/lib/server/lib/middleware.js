@@ -12,6 +12,7 @@ const { AJAX_POSTFIX } = require('../../lib/constants')
 
 const getMiddleware = ({
   App,
+  getAnalytics = () => {},
   reduxRoutes,
   reduxReducers,
   spoofLoggedIn,
@@ -46,6 +47,8 @@ const getMiddleware = ({
 
   function respondWith (fetcher = () => ({})) {
     return async (req, res, next) => {
+      const analytics = await getAnalytics(req)
+
       try {
         const pageData = await fetcher({
           data: {},
@@ -53,7 +56,8 @@ const getMiddleware = ({
           body: req.body,
           files: req.files,
           query: req.query,
-          session: req.session
+          session: req.session,
+          analytics
         })
         render(req, res, next, pageData)
       } catch (error) {
@@ -83,6 +87,8 @@ const getMiddleware = ({
   function respondWithGql (gqlQueryComposer = () => ({})) {
     return async (req, res, next) => {
       const requestGQLWithUser = ({ gql, variables }) => requestGQL(req.session.userId, gql, variables)
+      const analytics = await getAnalytics(req)
+
       // fetch page data based on given gql query
       const { gql, variables, respond, transformData, catcher } = await gqlQueryComposer({
         params: req.params,
@@ -91,6 +97,7 @@ const getMiddleware = ({
         query: req.query,
         session: req.session,
         requestGQL: requestGQLWithUser,
+        analytics,
         req,
         res
       })
@@ -186,6 +193,7 @@ const getMiddleware = ({
 
       res.status(status).render('app', {
         data: serialize(renderData, { isJSON: true }),
+        sessionUser: serialize({ id: req.session.userId }, { isJSON: true }),
         renderedClassNames: serialize(staticContext.css.renderedClassNames, { isJSON: true }),
         cssContent: staticContext.css.content,
         html: staticContext.html,
