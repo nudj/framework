@@ -19,31 +19,31 @@ const getMiddleware = ({
   errorHandlers,
   gqlFragments
 }) => {
-  function doEnsureLoggedIn (req, res, next) {
-    if (req.session.logout) {
-      let url = req.originalUrl.split('/')
-      url.pop()
-      res.redirect(url.join('/'))
-    } else {
-      if (req.xhr) {
-        if (!req.isAuthenticated || !req.isAuthenticated()) {
-          return res.status(401).send()
+  function ensureAuthorised (redirectPathOverride) {
+    return (req, res, next) => {
+      if (req.session.logout) {
+        let url = req.originalUrl.split('/')
+        url.pop()
+        res.redirect(url.join('/'))
+      } else {
+        if (req.xhr) {
+          if (!req.isAuthenticated || !req.isAuthenticated()) {
+            return res.status(401).send()
+          }
         }
+        _ensureLoggedIn.ensureLoggedIn({
+          setReturnTo: !req.session.returnTo,
+          redirectTo: `/${redirectPathOverride || 'auth'}?${toQs(req.query)}`
+        })(
+          req,
+          res,
+          next
+        )
       }
-      _ensureLoggedIn.ensureLoggedIn({
-        setReturnTo: !req.session.returnTo,
-        redirectTo: `/login?${toQs(req.query)}`
-      })(
-        req,
-        res,
-        next
-      )
+      delete req.session.logout
     }
-    delete req.session.logout
   }
-
-  const spoofUser = process.env.SPOOF_USER === 'true'
-  const ensureLoggedIn = spoofUser ? spoofLoggedIn : doEnsureLoggedIn
+  const ensureLoggedIn = ensureAuthorised('login')
 
   function respondWith (fetcher = () => ({})) {
     return async (req, res, next) => {
@@ -217,6 +217,7 @@ const getMiddleware = ({
 
   return {
     ensureLoggedIn,
+    ensureAuthorised,
     respondWith,
     respondWithGql,
     render
