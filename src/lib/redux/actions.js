@@ -1,6 +1,5 @@
 const { push, replace } = require('@nudj/react-router-redux')
 const get = require('lodash/get')
-const { merge } = require('@nudj/library')
 
 const request = require('../lib/request')
 const { addAjaxPostfix } = require('../lib')
@@ -165,9 +164,10 @@ module.exports.postData = ({
     return request({
       url: addAjaxPostfix(url),
       method,
-      data: data && merge(data, {
-        _csrf: state.app.csrfToken
-      }),
+      data,
+      headers: {
+        'X-CSRF-TOKEN': state.app.csrfToken
+      },
       params
     })
     .then((data) => {
