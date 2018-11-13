@@ -3,6 +3,7 @@ const get = require('lodash/get')
 const logger = require('./logger')
 
 function createErrorFromObject (errorObject) {
+  console.log('errorObject', errorObject)
   const error = new Error(errorObject.message)
   Object.keys(errorObject).forEach(key => {
     error[key] = errorObject[key]
