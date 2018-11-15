@@ -149,7 +149,7 @@ module.exports = ({
   if (process.env.REDIS_SESSION === 'true') {
     // add redis persistence to session
     sessionOpts.store = new RedisStore({
-      client: redis.createClient(process.env.REDIS_HOST, process.env.REDIS_PORT)
+      client: redis.createClient(process.env.REDIS_PORT, process.env.REDIS_HOST)
     })
   }
 
