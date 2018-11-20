@@ -155,13 +155,15 @@ module.exports.postData = ({
   method = 'post',
   data,
   showLoadingState = true,
+  jsonOnly = false,
   params
 }, callback) => {
-  return (dispatch, getState) => {
+  return async (dispatch, getState) => {
     const state = getState()
     dispatch(hideDialog())
     if (showLoadingState) dispatch(showLoading())
-    return request({
+
+    const result = request({
       url: addAjaxPostfix(url),
       method,
       data,
@@ -170,7 +172,12 @@ module.exports.postData = ({
       },
       params
     })
-    .then((data) => {
+
+    if (jsonOnly) return result
+
+    try {
+      const data = await result
+
       const notification = get(data, 'app.notification')
       if (notification) {
         data.app.notification.timer = setTimeout(() => dispatch(hideNotification()), 5000)
@@ -190,8 +197,7 @@ module.exports.postData = ({
       }
 
       return dispatch(fetchedPage(data))
-    })
-    .catch((error) => {
+    } catch (error) {
       if (process.env.NODE_ENV !== 'production') console.error(error)
       const authorities = {
         nudj: '',
@@ -206,7 +212,7 @@ module.exports.postData = ({
         return dispatch(showNotFound())
       }
       dispatch(showError())
-    })
+    }
   }
 }
 
