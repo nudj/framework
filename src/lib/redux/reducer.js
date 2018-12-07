@@ -33,7 +33,7 @@ function appReducer (state = initialState, action) {
     case SHOW_NOTIFICATION:
       return merge(state, { notification: merge(action.notification, { hide: false }) })
     case HIDE_NOTIFICATION:
-      return merge(state, { notification: { hide: true, timer: false } })
+      return merge(state, { notification: { hide: true } })
     case SHOW_NOT_FOUND:
       return merge(state, { error: { code: 404 }, loading: false })
     case SHOW_ERROR:

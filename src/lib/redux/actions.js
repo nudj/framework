@@ -20,9 +20,6 @@ module.exports.initialise = () => {
   return (dispatch, getState) => {
     const state = getState()
     const notification = get(state, 'app.notification')
-    if (notification) {
-      notification.timer = setTimeout(() => dispatch(hideNotification()), 5000)
-    }
     dispatch(initialised(notification))
   }
 }
@@ -50,6 +47,7 @@ function showLoading () {
 }
 module.exports.showLoading = () => {
   return (dispatch, getState) => {
+    dispatch(hideNotification())
     dispatch(showLoading())
   }
 }
@@ -97,17 +95,9 @@ module.exports.showNotification = (nextNotification) => {
       }
     } = getState()
 
-    if (currentNotification) {
-      dispatch(hideNotification())
-      clearTimeout(currentNotification.timer)
-    }
+    if (currentNotification) dispatch(hideNotification())
 
-    dispatch(showNotification({
-      ...nextNotification,
-      timer: nextNotification.timer || setTimeout(() => {
-        dispatch(hideNotification())
-      }, 5000)
-    }))
+    dispatch(showNotification(nextNotification))
   }
 }
 
@@ -171,11 +161,6 @@ module.exports.postData = ({
       params
     })
     .then((data) => {
-      const notification = get(data, 'app.notification')
-      if (notification) {
-        data.app.notification.timer = setTimeout(() => dispatch(hideNotification()), 5000)
-      }
-
       const currentUrl = `${window.location.pathname}${window.location.search}`
       const requestedPath = url
       const resolvedUrl = data.app.url.originalUrl
