@@ -1,7 +1,5 @@
 const get = require('lodash/get')
 const _ensureLoggedIn = require('connect-ensure-login')
-const getTime = require('date-fns/get_time')
-const encodeHMACSHA256 = require('crypto-js/hmac-sha256')
 const { merge, toQs } = require('@nudj/library')
 const serialize = require('serialize-javascript')
 
@@ -65,23 +63,6 @@ const getMiddleware = ({
         next(error)
       }
     }
-  }
-
-  async function fetchUser (userId) {
-    if (!userId) return null
-
-    const gql = `
-      query fetchUser {
-        user {
-          email
-          firstName
-          lastName
-        }
-      }
-    `
-
-    const { user } = await requestGQL(userId, gql)
-    return user
   }
 
   function respondWithGql (gqlQueryComposer = () => ({})) {
@@ -171,25 +152,11 @@ const getMiddleware = ({
     if (staticContext.url) {
       res.redirect(staticContext.url)
     } else {
-      const user = await fetchUser(req.session.userId)
       let status = get(
         renderData,
         'app.error.code',
         staticContext.status || 200
       )
-      let intercomUserToken = null
-      let email = null
-      let fullname = null
-
-      if (user && user.email) {
-        // Similar to intercom.createUser (creates a user if they do not exist)
-        intercomUserToken = encodeHMACSHA256(user.email, process.env.INTERCOM_SECRET_KEY)
-        email = user.email
-      }
-
-      if (user && user.firstName && user.lastName) {
-        fullname = `${user.firstName} ${user.lastName}`
-      }
 
       res.status(status).render('app', {
         data: serialize(renderData, { isJSON: true }),
@@ -198,17 +165,6 @@ const getMiddleware = ({
         cssContent: staticContext.css.content,
         html: staticContext.html,
         helmet: staticContext.helmet,
-        cookiesAccepted: req.cookies.cookiesEnabled !== 'false',
-        fullstory_data: serialize({
-          user_id: req.session.userId
-        }),
-        intercom_data: serialize({
-          app_id: process.env.INTERCOM_APP_ID,
-          user_token: intercomUserToken && `${intercomUserToken}`,
-          email: email,
-          fullname,
-          created_at: user && user.created ? getTime(user.created) / 1000 : null
-        }, { isJSON: true }),
         env: process.env.NODE_ENV,
         build_asset_path: process.env.USE_DEV_SERVER ? `${process.env.DEV_SERVER_PATH}` : ''
       })
